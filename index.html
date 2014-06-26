@@ -102,7 +102,7 @@ function runit() {
 
 
  
-<button type="button" onclick="runit()">Run</button> 
+<button type="button" onclick="makeJSandSendToElm()">Run</button> 
 </form></div>
 </div>
 
@@ -120,15 +120,21 @@ function runit() {
 <script type="text/javascript">
   // Show the stamp module in the "elm-stamps" div.
   var div = document.getElementById('game');
-  var game = Elm.embed(Elm.Game, div, {  });
+  var game = Elm.embed(Elm.Game, div, { code_port: "" });
 
-  // Reset the number of stamps in the Elm code.
-  // The value we send does not matter, we just
-  // need the event.
-  function resetStamps() {
-    stamps.ports.reset.send([]);
+  // Translate Python to JS and sends to the Elm code.
+
+  function makeJSandSendToElm() {
+    var prog = document.getElementById("code").value; 
+    
+    Sk.configure({output:outf, read:builtinRead}); 
+    try { 
+       game.ports.code_port.send(Sk.importMainWithBody("<stdin>",false,prog));
+    }
+    catch(e) {
+       alert(e.toString())
+    }
   }
-
   // Always show the latest count of stamps, which is exported
   // from the Stamps module as the 'count' event stream.
   var currentCount = document.getElementById('current-count'),

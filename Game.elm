@@ -3,6 +3,9 @@ module Game where
 import Keyboard
 import Window
 
+-- incoming messages typed by your chat parter
+port code_port : Signal String
+
 -- MODEL
 mario = { x=0, y=0, vx=0, vy=0, dir="right" }
 
@@ -38,3 +41,5 @@ input = let delta = lift (\t -> t/20) (fps 25)
         in sampleOn delta (lift2 (,) delta Keyboard.arrows)
 
 main  = lift2 render Window.dimensions (foldp step mario input)
+
+--main = lift asText code_port
