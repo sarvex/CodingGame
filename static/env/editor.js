@@ -1,17 +1,19 @@
+var editor; // TODO: Get rid of global var
 $(document).ready(function () {
     var output = $('#edoutput');
     var outf = function (text) {
         output.text(output.text() + text);
     };
-    
+
     var keymap = {
-        "Ctrl-Enter" : function (editor) {
+        "Ctrl-Enter": function (editor) {
             Sk.configure({output: outf, read: builtinRead});
             Sk.canvas = "mycanvas";
             Sk.pre = "edoutput";
             try {
-                Sk.importMainWithBody("<stdin>", false, editor.getValue());
-            } catch(e) {
+                var module = Sk.importMainWithBody("<stdin>", false, editor.getValue());
+                $(document).trigger("codeLaunched", module);
+            } catch (e) {
                 outf(e.toString() + "\n")
             }
         },
@@ -21,14 +23,14 @@ $(document).ready(function () {
             Sk.pre = "edoutput";
             try {
                 Sk.importMainWithBody("<stdin>", false, editor.getSelection());
-            } catch(e) {
+            } catch (e) {
                 outf(e.toString() + "\n")
             }
         }
     }
 
 
-    var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    editor = CodeMirror.fromTextArea(document.getElementById('code'), {
         parserfile: ["parsepython.js"],
         autofocus: true,
         theme: "solarized dark",
@@ -43,7 +45,9 @@ $(document).ready(function () {
         parserConfig: {'pythonVersion': 2, 'strictErrors': true}
     });
 
-    $("#skulpt_run").click(function (e) { keymap["Ctrl-Enter"](editor)} );
+    $("#skulpt_run").click(function (e) {
+        keymap["Ctrl-Enter"](editor)
+    });
 
     $("#toggledocs").click(function (e) {
         $("#quickdocs").toggle();

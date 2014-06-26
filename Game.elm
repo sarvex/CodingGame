@@ -2,6 +2,7 @@ module Game where
 
 import Keyboard
 import Window
+import Mouse
 
 -- incoming code source for player control
 port code_port : Signal String
@@ -40,6 +41,8 @@ render (w',h') mario =
 input = let delta = lift (\t -> t/20) (fps 25)
         in sampleOn delta (lift2 (,) delta Keyboard.arrows)
 
-main  = lift2 render Window.dimensions (foldp step mario input)
+--main  = lift2 render Window.dimensions (foldp step mario input)
 
---main = lift asText code_port
+main = lift asText code_port
+port messageOut : Signal Int
+port messageOut = Mouse.x

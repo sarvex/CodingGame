@@ -1,10 +1,10 @@
 <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-<html> 
-<head> 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script> 
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
     <!--Skulpt runtime-->
-    <script src="static/skulpt.min.js" type="text/javascript"></script> 
-    <script src="static/skulpt-stdlib.js" type="text/javascript"></script> 
+    <script src="static/skulpt.min.js" type="text/javascript"></script>
+    <script src="static/skulpt-stdlib.js" type="text/javascript"></script>
 
     <link rel="stylesheet" type="text/css" media="all" href="static/codemirror.css">
     <link rel="stylesheet" type="text/css" media="all" href="static/solarized.css">
@@ -20,127 +20,127 @@
 
     <style>
 
-        html { overflow-y: hidden; }
-
-        
+        html {
+            overflow-y: hidden;
+        }
 
         #column-code-wrap {
             float: top;
             height: 100%;
         }
+
         #column-code {
             margin-bottom: 100px;
         }
 
         #game {
-          width:  100%;
-          height: 200px;
-          float: top;
-          background-color: white;
-          border: 1px solid #babdb6;
+            width: 100%;
+            height: 200px;
+            float: top;
+            background-color: white;
+            border: 1px solid #babdb6;
         }
 
         #clear {
             clear: both;
         }
     </style>
-  
-</head> 
- 
-<body> 
- 
-<script type="text/javascript"> 
-// output functions are configurable.  This one just appends some text
-// to a pre element.
-function outf(text) { 
-    var mypre = document.getElementById("output"); 
-    mypre.innerHTML = mypre.innerHTML + text; 
-} 
-function builtinRead(x) {
-    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+
+</head>
+
+<body>
+
+<script type="text/javascript">
+    // output functions are configurable.  This one just appends some text
+    // to a pre element.
+    function outf(text) {
+        var mypre = document.getElementById("output");
+        mypre.innerHTML = mypre.innerHTML + text;
+    }
+    function builtinRead(x) {
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
             throw "File not found: '" + x + "'";
-    return Sk.builtinFiles["files"][x];
-}
- 
-// Here's everything you need to run a python program in skulpt
-// grab the code from your textarea
-// get a reference to your pre element for output
-// configure the output function
-// call Sk.importMainWithBody()
-function runit() { 
-   var prog = document.getElementById("code").value; 
-   var mypre = document.getElementById("output"); 
-   mypre.innerHTML = ''; 
-   Sk.canvas = "mycanvas";
-   Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead}); 
-   try {
-      eval(Sk.importMainWithBody("<stdin>",false,prog)); 
-   }
-   catch(e) {
-       alert(e.toString())
-   }
-} 
-</script> 
+        return Sk.builtinFiles["files"][x];
+    }
+
+</script>
 
 
+<h1>Coding game</h1>
 
- 
-<h1>Coding game</h1> 
 <div class="page">
-<div class="body">
-<div class="main">
+    <div class="body">
+        <div class="main">
 
 <div id="code-column-wrap">
     <div id="code-column">
     <form>
-      <textarea id="code" style="width:500;height:30%">def hero_action(game_world):
-    return RunAction()
+      <textarea id="code" style="width:500;height:30%">def hero_action(mouse_x):
+    return "far left" if int(mouse_x) < 250 else "far right"
 
 
       </textarea><br />
 
 
- 
-<button type="button" onclick="makeJSandSendToElm()">Run</button> 
+
+<button type="button" id="skulpt_run">Run</button>
 </form></div>
 </div>
 
 
-</div>
-</div>
+        </div>
+    </div>
 </div>
 
 <div id="game"></div>
 
 <div id="clear"></div>
- 
+
 </body>
 
 <script type="text/javascript">
-  // Show the stamp module in the "elm-stamps" div.
-  var div = document.getElementById('game');
-  var game = Elm.embed(Elm.Game, div, { code_port: "" });
+    $(document).ready(function () {
+        var queue = new Array();
+        var div = document.getElementById('game');
+        var game = Elm.embed(Elm.Game, div, { code_port: "" });
+        var fun;
+        game.ports.messageOut.subscribe(function(param){
+            try {
+                if (! fun) {
+                    alert("Call Run first!");
+                    return;
+                }
+                var result = Sk.misceval.callsim(fun, param).v;
+                game.ports.code_port.send(result);
+            }catch (ex) {
+                alert(ex);
+            }
+        });
 
-  // Translate Python to JS and sends to the Elm code.
+        $(document).bind("codeLaunched", function (event, module) {
+            try {
+                fun = module.tp$getattr('hero_action');
+            } catch (ex) {
+                alert("Error:" + ex);
+            }
+        });
 
-  function makeJSandSendToElm() {
-    var prog = document.getElementById("code").value; 
-    
-    Sk.configure({output:outf, read:builtinRead}); 
-    try { 
-       game.ports.code_port.send(Sk.importMainWithBody("<stdin>",false,prog));
-    }
-    catch(e) {
-       alert(e.toString())
-    }
-  }
-  // Always show the latest count of stamps, which is exported
-  // from the Stamps module as the 'count' event stream.
-  var currentCount = document.getElementById('current-count'),
-      totalCount   = document.getElementById('total-count'),
-      total        = 0;
-  
-</script> 
- 
+        setInterval(function(){
+                    if (queue.length > 0) {
+                      //game.ports.code_port.send(queue.pop());
+                    }}, 1000);
+    });
+    // Show the stamp module in the "elm-stamps" div.
+
+
+    // Translate Python to JS and sends to the Elm code.
+
+    // Always show the latest count of stamps, which is exported
+    // from the Stamps module as the 'count' event stream.
+    var currentCount = document.getElementById('current-count'),
+            totalCount = document.getElementById('total-count'),
+            total = 0;
+
+</script>
+
 </html> 
