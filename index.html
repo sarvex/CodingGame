@@ -75,10 +75,10 @@
 <div id="code-column-wrap">
     <div id="code-column">
     <form>
-      <textarea id="code" style="width:500;height:30%">def hero_action(mouse_x):
-    return "far left" if int(mouse_x) < 250 else "far right"
-
-
+      <textarea id="code" style="width:500;height:30%">import game
+class HeroLogic(game.Logic):
+    def get_command(self, mouse_x):
+        return game.Jump() if mouse_x > 200 else game.Left()
       </textarea><br />
 
 
@@ -99,8 +99,12 @@
 </body>
 
 <script type="text/javascript">
+    jQuery.ajaxSetup({async:false});
+    // TODO: Fix
+    Sk.builtinFiles["files"]['src/lib/game.py'] = jQuery.get("game.py").responseText;
+
+
     $(document).ready(function () {
-        var queue = new Array();
         var div = document.getElementById('game');
         var game = Elm.embed(Elm.Game, div, { code_port: "" });
         var fun;
@@ -110,8 +114,12 @@
                     alert("Call Run first!");
                     return;
                 }
-                var result = Sk.misceval.callsim(fun, param).v;
-                game.ports.code_port.send(result);
+
+                var result = Sk.ffi.remapToJs(Sk.misceval.callsim(fun, param));
+
+                if (result) {
+                    game.ports.code_port.send(result);
+                }
             }catch (ex) {
                 alert(ex);
             }
@@ -119,16 +127,19 @@
 
         $(document).bind("codeLaunched", function (event, module) {
             try {
-                fun = module.tp$getattr('hero_action');
+                var clz = module.tp$getattr('HeroLogic');
+                if (! clz) {
+                    alert("Class HeroLogic not found");
+                }
+                fun = clz().tp$getattr('_get_dict');
+                if (! clz) {
+                    alert("function  not found");
+                }
             } catch (ex) {
                 alert("Error:" + ex);
             }
         });
 
-        setInterval(function(){
-                    if (queue.length > 0) {
-                      //game.ports.code_port.send(queue.pop());
-                    }}, 1000);
     });
     // Show the stamp module in the "elm-stamps" div.
 

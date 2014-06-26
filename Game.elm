@@ -3,9 +3,12 @@ module Game where
 import Keyboard
 import Window
 import Mouse
+import Json
+import Dict
 
 -- incoming code source for player control
-port code_port : Signal String
+
+port code_port : Signal Json.Value
 
 -- MODEL
 mario = { x=0, y=0, vx=0, vy=0, dir="right" }
@@ -43,6 +46,22 @@ input = let delta = lift (\t -> t/20) (fps 25)
 
 --main  = lift2 render Window.dimensions (foldp step mario input)
 
-main = lift asText code_port
+
+json_processor: (Dict.Dict String Json.Value) -> String
+json_processor d = concat[
+    "I will ",
+    (Json.toString "" (Dict.getOrFail "action" d)),
+    " to ",
+    (Json.toString "" (Dict.getOrFail "direction" d))]
+
+smart_text_obtainer: Json.Value -> String
+smart_text_obtainer json_value =
+        case json_value of
+            Json.String s -> s
+            Json.Object d ->  json_processor d
+
+
+
+main = lift (\json->asText (smart_text_obtainer json)) code_port
 port messageOut : Signal Int
 port messageOut = Mouse.x
