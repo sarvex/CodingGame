@@ -3,7 +3,7 @@ module Game where
 import Keyboard
 import Window
 
--- incoming messages typed by your chat parter
+-- incoming code source for player control
 port code_port : Signal String
 
 -- MODEL
