@@ -83,7 +83,7 @@ data Direction = Right | Left
 
 type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float, h: Float}
 
-defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 20, h = 35}
+defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 30, h = 46}
 
 
 type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float}
@@ -104,7 +104,7 @@ actionToArrows action =
 
 defaultHero: Level->Hero
 defaultHero level = 
-  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, w = 20, h=35}
+  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, w = 30, h=46}
 
 
 dead: Float->Float->Float->Float->Level->Bool
@@ -212,7 +212,7 @@ render (w',h') game =
       --, rect w 50 |> filled (rgb 74 163 41)
                   --|> move (0, 24 - h/2)
       ++ [ (if game.state == Before then toForm (plainText "Press Run to Start") 
-                                    else (toForm (image (round hero.h) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
+                                    else (toForm (image (round hero.w) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
       )
 
 encodeArrows {x, y} = if | x >0 -> Forward
