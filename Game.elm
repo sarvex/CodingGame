@@ -191,7 +191,8 @@ render (w',h') game =
       verb = if | hero.y  >  0 -> "jump"
                 | hero.vx /= 0 -> "walk"
                 | otherwise     -> "stand"
-      src  = "imgs/mario/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
+      -- src  = "imgs/man/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
+      src  = "imgs/man/walk/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
   in collage w' h'
       ([ rect w h  |> filled (rgb 174 238 238)]
       ++ (drawGround w h level) 
