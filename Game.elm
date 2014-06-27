@@ -83,14 +83,14 @@ data Direction = Right | Left
 
 type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float, h: Float}
 
-hero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 20, h = 35}
+defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 20, h = 35}
 
 
 type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float}
 
 
 defaultGame: Game
-defaultGame = {state = Before, level_num=0, hero=hero, levels = levels, w = 0, h = 0}
+defaultGame = {state = Before, level_num=0, hero=defHero, levels = levels, w = 0, h = 0}
 
 
 actionToArrows: Action->(Int, Int)
@@ -254,10 +254,13 @@ port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
 
 obstacle_front g = 
-   let s = g.hero.h/2
+   let 
+       hero = g.hero
        b = groundBlocks g.w (cur_level g)
-       hor_int  = intersectBlocksHor hero.x hero.y (hero.w/2) (hero.h/2)  b
-   in not (isNothing hor_int)
+       x = hero.x
+       y = hero.y
+       seg  = intersectBlocksHor x  (y + hero.h) hero.w hero.h  b
+   in not (isNothing seg)
 
 -- Send Record
 port messageOut : Signal ({ hero_x:Int, hero_y:Int, obstacle_front:Bool, obstacle_back:Bool, obstacle_top:Bool })
