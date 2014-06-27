@@ -187,12 +187,12 @@ step t dir g = physics t dir g
 
 
 
-drawGround: Float -> Float -> Level -> [Form]
-drawGround w h level = map (\(y, (x1, x2)) -> rect (x2-x1) y
-                            |> filled (rgb 74 163 41) 
-                            |> move (x1 + (x2-x1)/2 - w/2, y/2 - h/2) 
-                            )
-                         (groundBlocks w level) 
+--drawGround: Float -> Float -> Level -> [Form]
+--drawGround w h level = map (\(y, (x1, x2)) -> rect (x2-x1) y
+--                            |> filled (rgb 74 163 41)
+--                            |> move (x1 + (x2-x1)/2 - w/2, y/2 - h/2)
+--                            )
+--                         (groundBlocks w level)
 
 
 -- DISPLAY
@@ -207,8 +207,8 @@ render (w',h') game =
       -- src  = "imgs/man/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
       src  = "imgs/man/walk/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
   in collage w' h'
-      ([ rect w h  |> filled (rgb 174 238 238)]
-      ++ (drawGround w h level) 
+      ([(toForm (image 751 302 "imgs/levels/1.jpg"))]
+
       --, rect w 50 |> filled (rgb 74 163 41)
                   --|> move (0, 24 - h/2)
       ++ [ (if game.state == Before then toForm (plainText "Press Run to Start") 
