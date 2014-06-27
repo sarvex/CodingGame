@@ -230,8 +230,8 @@ newinput delta action (w,h) = {delta = delta, action =  action, w = w, h = h}
 
 input: Signal Input
 input = let delta = lift (\t -> t/20) (fps 25)
-        --in sampleOn delta (lift3 newinput delta (lift record_to_action code_port) Window.dimensions)
-        in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
+        in sampleOn delta (lift3 newinput delta (lift record_to_action code_port) Window.dimensions)
+        --in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
 
 
 --- Main --- 
