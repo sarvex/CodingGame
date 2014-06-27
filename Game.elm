@@ -11,7 +11,7 @@ import Levels (..)
 
 -- incoming code source for player control
 
-port code_port : Signal Json.Value
+port code_port : Signal ({action:String, direction:String})
 
 
 
@@ -169,22 +169,26 @@ input = let delta = lift (\t -> t/20) (fps 25)
 --main  = lift2 render Window.dimensions gameState
 
 
-json_processor: (Dict.Dict String Json.Value) -> String
-json_processor d = concat[
-    "I will ",
-    (Json.toString "" (Dict.getOrFail "action" d)),
-    " to ",
-    (Json.toString "" (Dict.getOrFail "direction" d))]
+-- json_processor: (Dict.Dict String Json.Value) -> String
+-- json_processor d = concat[
+    -- "I will ",
+    -- (Json.toString "" (Dict.getOrFail "action" d)),
+    -- " to ",
+    -- (Json.toString "" (Dict.getOrFail "direction" d))]
 
-smart_text_obtainer: Json.Value -> String
-smart_text_obtainer json_value =
-        case json_value of
-            Json.String s -> s
-            Json.Object d ->  json_processor d
+-- smart_text_obtainer: Json.Value -> String
+-- smart_text_obtainer json_value =
+        -- case json_value of
+            -- Json.String s -> s
+            -- Json.Object d ->  json_processor d
+record_to_action: ({action:String, direction:String})->Action
+record_to_action rec = 
+  if | rec.action == "forward" -> Forward
+     | rec.action == "jump" -> Jump
+     | otherwise -> None
 
 
-
-main = lift (\json->asText (smart_text_obtainer json)) code_port
+main = lift (\json->asText (record_to_action json)) code_port
 
 -- This function is exported to python as _game.summarize (see its usages in game.py)
 port summarize: Int -> Int -> Int

@@ -14,6 +14,11 @@ class Command(object):
         return {"action": clz.command_name, "direction": clz.direction}
 
 
+class Forward(Command):
+    command_name = "forward"
+    direction = "forward"
+
+
 class Jump(Command):
     def __init__(self, direction=TOP):
         self.direction = direction
@@ -22,14 +27,14 @@ class Jump(Command):
         return {"action": "jump", "direction": self.direction}
 
 
-class Left(Command):
-    command_name = "turn"
-    direction = LEFT
-
-
-class Right(Command):
-    command_name = "turn"
-    direction = RIGHT
+# class Left(Command):
+#     command_name = "turn"
+#     direction = LEFT
+#
+#
+# class Right(Command):
+#     command_name = "turn"
+#     direction = RIGHT
 
 
 class GameInfo(object):

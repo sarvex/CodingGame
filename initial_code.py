@@ -6,8 +6,7 @@ def hero_action(game_info):
 
     :type game_info game.GameInfo
     """
-    if not game_info.obstacle_top:
+    if game_info.obstacle_front:
         return game.Jump()
-    if not game_info.obstacle_front:
-        return game.Jump(game.LEFT)
-    return game.Right()
+    else:
+        return game.Forward()
