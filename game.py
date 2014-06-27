@@ -1,4 +1,3 @@
-
 class Command(object):
     command_name = None
     direction = None
@@ -9,8 +8,11 @@ class Command(object):
 
 
 class Jump(Command):
-    command_name = "jump"
-    direction = "up"
+    def __init__(self, direction):
+        self.direction = direction
+
+    def _get_dict(self):
+        return {"action": "jump", "direction": self.direction}
 
 
 class Left(Command):
