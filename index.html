@@ -111,7 +111,7 @@
 
         var div = document.getElementById('game');
         // TODO: Move default value to python
-        var game = Elm.embed(Elm.Game, div, { code_port: {action: "forward", direction: "forward"} });
+        var game = Elm.embed(Elm.Game, div, { code_port: {action: "None", direction: "None"} });
 
         //TODO: Ugly, global var way to export ELM api functions, rewrite
         window.ELM_API.summarize = game.ports.summarize;
