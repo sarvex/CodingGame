@@ -169,18 +169,6 @@ input = let delta = lift (\t -> t/20) (fps 25)
 --main  = lift2 render Window.dimensions gameState
 
 
--- json_processor: (Dict.Dict String Json.Value) -> String
--- json_processor d = concat[
-    -- "I will ",
-    -- (Json.toString "" (Dict.getOrFail "action" d)),
-    -- " to ",
-    -- (Json.toString "" (Dict.getOrFail "direction" d))]
-
--- smart_text_obtainer: Json.Value -> String
--- smart_text_obtainer json_value =
-        -- case json_value of
-            -- Json.String s -> s
-            -- Json.Object d ->  json_processor d
 record_to_action: ({action:String, direction:String})->Action
 record_to_action rec = 
   if | rec.action == "forward" -> Forward
