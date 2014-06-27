@@ -28,9 +28,9 @@ data Action = Forward | Backward | Jump | None
 data Direction = Right | Left
 
 
-type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction}
+type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, size: Float}
 
-hero = { x=0, y=0, vx=0, vy=0, dir=Right }
+hero = { x=0, y=0, vx=0, vy=0, dir=Right, size = 35}
 
 
 type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float}
@@ -51,7 +51,7 @@ actionToArrows action =
 
 defaultHero: Level->Hero
 defaultHero level = 
-  {x = 0, y = head level.groundy, vx=0, vy=0, dir=Right}
+  {x = 0, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, size=35}
 
 
 dead: Float->Float->Float->Float->Level->Bool
@@ -98,28 +98,42 @@ gameState = foldp stepGame defaultGame input
 
 -- Physics --
 
+corpus hero v = 
+    if v <0 then -hero.size/2 else hero.size 
 
-jump: (Int, Int)->Game->Hero->Hero
-jump (x, y) g hero =
-  if (y > 0) && (hero.y == 0) then { hero | vy <- 5 } else hero
+move_hor: Float->Float->Maybe Segment->Float
+move_hor x dx s = case s of
+                     Nothing -> x + dx
+                     Just (y, (x1, x2)) -> if | dx<0 -> x2
+                                             | dx>0 -> x1
+                                             | otherwise -> x + dx 
+move_vert: Float->Float->Maybe Segment->Float
+move_vert y dy s = case s of
+                     Nothing -> y + dy
+                     Just (y', (x1, x2)) -> if  dy<0 then y' else y + dy
+                                             
 
-gravity: Float->Game->Hero->Hero
-gravity t g hero=   
-  if not (intersectBlocks (hero.x, hero.y) (groundBlocks g.w (cur_level g))) then { hero | vy <- hero.vy - t/4 } else hero
 
-physics: Float->Game->Hero->Hero
-physics t g hero =   
-  { hero | x <- hero.x + t*hero.vx , y <- max 0 (hero.y + t*hero.vy) }
-
-walk: (Int, Int)->Game->Hero->Hero
-walk (x, y) g hero =
-  { hero | vx <- toFloat x
-                 , dir <- if | x < 0     -> Left
-                             | x > 0     -> Right
-                             | otherwise -> hero.dir }
+physics: Float->(Int, Int)->Game->Hero->Hero
+physics t (dir_x, dir_y) g hero =  
+  let m_v = { hero | y <- hero.y + t*hero.vy }
+      m_h  = { hero | x <- hero.x + t*hero.vx }
+      b = groundBlocks g.w (cur_level g)
+      vert_int = intersectBlocks m_v.x (m_v.y + (corpus m_v m_v.y))  b
+      hor_int  = intersectBlocks (m_h.x + (corpus m_h m_h.x)) m_h.y b
+  in { hero | x <- move_hor hero.x (t*hero.vx) hor_int,
+              y <- move_vert hero.y (t*hero.vy) vert_int,
+              vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
+                    else if dir_y>0 then 5 -- jump
+                    else 0, -- stand
+              vx <- toFloat dir_x,    -- walking speed
+              dir <- if | dir_x < 0     -> Left
+                        | dir_x > 0     -> Right
+                        | otherwise   -> hero.dir
+     } 
 
 step: Float -> (Int, Int) -> Game -> Hero-> Hero
-step t dir g = physics t g . walk dir g . gravity t g . jump dir g
+step t dir g = physics t dir g
 
 
 
@@ -146,7 +160,8 @@ render (w',h') game =
       ++ (drawGround w h level) 
       --, rect w 50 |> filled (rgb 74 163 41)
                   --|> move (0, 24 - h/2)
-      ++ [ (if game.state == Before then toForm (plainText "Press Run to Start") else (toForm (image 35 35 src) |> move (hero.x, hero.y + 17 - h/2)))]
+      ++ [ (if game.state == Before then toForm (plainText "Press Run to Start") 
+                                    else (toForm (image (round hero.size) (round hero.size) src) |> move (hero.x, hero.y + hero.size/2 - h/2)))]
       )
 
 encodeArrows {x, y} = if | x >0 -> Forward

@@ -1,12 +1,15 @@
 module Levels where
 
 import Array
+import Maybe (Maybe, Nothing, Just)
 
 eps = 0.00001
 
 
 type Level = {groundx: [Float], groundy: [Float]}
 type Levels = Array.Array Level
+
+type Segment = (Float, (Float, Float))
 
 levels: Levels
 levels = Array.fromList [ 
@@ -23,12 +26,18 @@ levels = Array.fromList [
    ]
 
 
+get_level: Int->Array.Array Level->Level 
+get_level level_num levels = 
+  Array.getOrFail level_num levels --todo handle maybe
+  
 
-groundBlocks: Float->Level -> [(Float, (Float, Float))]
+groundBlocks: Float->Level->[Segment]
 groundBlocks w level = 
       (zip (level.groundy) (zip (level.groundx ++ [w] ) (0 :: level.groundx) )) 
 
 
-intersectBlocks: (Float, Float) -> [(Float, (Float, Float))] -> Bool
-intersectBlocks (x, y) blocks =
-       not (isEmpty (filter (\(y1, (x1, x2)) -> if (x>x1-eps) && (x<x1+eps) && (y<y1+eps) then True else False ) blocks))   --TODO
+intersectBlocks: Float->Float->[Segment]->Maybe Segment
+intersectBlocks x y blocks =
+    let intersected = filter (\(y', (x1, x2)) -> if (x>x1-eps) && (x<x2+eps) && (y<y'+eps) then True else False ) blocks
+    in
+    if isEmpty intersected then Nothing else Just (head intersected)
