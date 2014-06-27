@@ -110,16 +110,14 @@ class HeroLogic(game.Logic):
         var fun;
         game.ports.messageOut.subscribe(function(param){
             try {
-                if (! fun) {
-                    alert("Call Run first!");
-                    return;
-                }
+                if (fun) {
+                    
+                    var result = Sk.ffi.remapToJs(Sk.misceval.callsim(fun, param));
 
-                var result = Sk.ffi.remapToJs(Sk.misceval.callsim(fun, param));
-
-                if (result) {
-                    game.ports.code_port.send(result);
-                }
+                    if (result) {
+                        game.ports.code_port.send(result);
+                    }
+                 }
             }catch (ex) {
                 alert(ex);
             }
