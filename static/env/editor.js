@@ -14,7 +14,9 @@ $(document).ready(function () {
                 var module = Sk.importMainWithBody("<stdin>", false, editor.getValue());
                 $(document).trigger("codeLaunched", module);
             } catch (e) {
-                outf(e.toString() + "\n")
+                var error = e.toString() + "\n";
+                alert(error);
+                outf(error);
             }
         },
         "Shift-Enter": function (editor) {

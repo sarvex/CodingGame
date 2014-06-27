@@ -192,7 +192,7 @@ input: Signal Input
 input = let delta = lift (\t -> t/20) (fps 25)
         in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
 
-main  = lift2 render Window.dimensions gameState
+--main  = lift2 render Window.dimensions gameState
 
 
 json_processor: (Dict.Dict String Json.Value) -> String
@@ -210,6 +210,6 @@ smart_text_obtainer json_value =
 
 
 
---main = lift (\json->asText (smart_text_obtainer json)) code_port
+main = lift (\json->asText (smart_text_obtainer json)) code_port
 port messageOut : Signal Int
 port messageOut = Mouse.x

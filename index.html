@@ -76,9 +76,8 @@
     <div id="code-column">
     <form>
       <textarea id="code" style="width:500;height:30%">import game
-class HeroLogic(game.Logic):
-    def get_command(self, mouse_x):
-        return game.Jump() if mouse_x > 200 else game.Left()
+def hero_action(mouse_x):
+    return game.Jump() if mouse_x > 200 else game.Left()
       </textarea><br />
 
 
@@ -111,8 +110,9 @@ class HeroLogic(game.Logic):
         game.ports.messageOut.subscribe(function(param){
             try {
                 if (fun) {
-                    
-                    var result = Sk.ffi.remapToJs(Sk.misceval.callsim(fun, param));
+
+                    var command = Sk.misceval.callsim(fun, param);
+                    var result = Sk.ffi.remapToJs(Sk.misceval.callsim(command.tp$getattr("_get_dict")));
 
                     if (result) {
                         game.ports.code_port.send(result);
@@ -125,13 +125,10 @@ class HeroLogic(game.Logic):
 
         $(document).bind("codeLaunched", function (event, module) {
             try {
-                var clz = module.tp$getattr('HeroLogic');
-                if (! clz) {
-                    alert("Class HeroLogic not found");
-                }
-                fun = clz().tp$getattr('_get_dict');
-                if (! clz) {
-                    alert("function  not found");
+                fun = module.tp$getattr('hero_action');
+
+                if (! fun) {
+                    alert("function hero_action not found");
                 }
             } catch (ex) {
                 alert("Error:" + ex);
