@@ -72,7 +72,7 @@
 <script type="text/javascript">
     window.ELM_API = {};
     jQuery.ajaxSetup({async: false});
-    var filesToInclude = ["game.py", "_game.js"];
+    var filesToInclude = ["game_api.py", "_game.js"];
     for (var i in  filesToInclude) {
         Sk.builtinFiles["files"]['src/lib/' + filesToInclude[i]] = jQuery.get(filesToInclude[i]).responseText;
     }
@@ -120,13 +120,13 @@
 
         $(document).bind("codeLaunched", function (event, module) {
             try {
-                fun = module.tp$getattr('hero_action');
+                fun = module.tp$getattr('robot_action');
 
                 if (!fun) {
-                    alert("function hero_action not found");
+                    alert("function robot_action not found");
                 }
 
-                var gameModule = Sk.importModule("game");
+                var gameModule = Sk.importModule("game_api");
                 infoConstructor = gameModule.tp$getattr('GameInfo');
                 if (!infoConstructor) {
                     alert("failed to load game.GameInfo");

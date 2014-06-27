@@ -37,10 +37,15 @@ class Jump(Command):
 #     direction = RIGHT
 
 
+class Gps(object):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
 class GameInfo(object):
     def __init__(self, params_dic):
-        self.hero_x = params_dic['hero_x']
-        self.hero_y = params_dic['hero_y']
+        self.gps = Gps(params_dic['hero_x'], params_dic['hero_y'])
         self.obstacle_front = params_dic['obstacle_front']
         self.obstacle_back = params_dic['obstacle_back']
         self.obstacle_top = params_dic['obstacle_top']

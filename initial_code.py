@@ -1,8 +1,8 @@
-import game
+from game_api import *
 
 
-def hero_action(game_info):
-    if game_info.obstacle_front:
-        return game.Jump()
+def robot_action(robot):
+    if robot.gps.x > 100:
+        return Jump()
     else:
-        return game.Forward()
+        return Forward()
