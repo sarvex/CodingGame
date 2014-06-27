@@ -76,7 +76,7 @@ data State = Before | Playing | Finished
 
 -- Game world description
 
-data Action = Forward | Backward | Jump | None
+data Action = Start | Forward | Backward | Jump | None
 
 data Direction = Right | Left
 
@@ -134,6 +134,7 @@ stepGame input ({state, level_num, hero, levels} as game) =
                            | state == Playing && level_num > (Array.length levels) -> Finished
                            | otherwise        -> state
            , hero    <- if | state == Before -> defaultHero level
+                           | state == Playing && action == Start -> defaultHero level 
                            | state == Playing -> 
                            if dead hero.x hero.y w h level then defaultHero level 
                            else step delta (actionToArrows action) game hero 
@@ -241,6 +242,7 @@ record_to_action: ({action:String, direction:String})->Action
 record_to_action rec = 
   if | rec.action == "forward" -> Forward
      | rec.action == "jump" -> Jump
+     | rec.action == "start" -> Start
      | otherwise -> None
 
 -- incoming code source for player control

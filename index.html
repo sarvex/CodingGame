@@ -81,7 +81,7 @@
 
 
 
-<button type="button" id="skulpt_run">Run</button>
+<button type="button" id="skulpt_run">Start</button>
 </form></div>
 </div>
 
@@ -147,8 +147,9 @@
                 if (!infoConstructor) {
                     alert("failed to load game.GameInfo");
                 }
-                game.ports.code_port.send({action: "forward", direction: "forward"});
-
+                run_button = document.getElementById("skulpt_run")
+                run_button.innerHTML = "Restart"
+                game.ports.code_port.send({action: "start", direction: "forward"});
 
             } catch (ex) {
                 alert("Error codeLaunched:" + ex);
