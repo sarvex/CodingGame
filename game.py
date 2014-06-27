@@ -1,6 +1,11 @@
+
 class Command(object):
     command_name = None
     direction = None
+
+    def _get_dict(self):
+        clz = self.__class__
+        return {"action": clz.command_name, "direction": clz.direction}
 
 
 class Jump(Command):
@@ -16,13 +21,3 @@ class Left(Command):
 class Right(Command):
     command_name = "turn"
     direction = "right"
-
-
-class Logic(object):
-    def get_command(self, mouse_x):
-        pass
-
-
-    def _get_dict(self, mouse_x):
-        commmand = self.get_command(mouse_x)
-        return {"action": commmand.command_name, "direction": commmand.direction}
