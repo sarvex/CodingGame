@@ -186,6 +186,9 @@ smart_text_obtainer json_value =
 
 main = lift (\json->asText (smart_text_obtainer json)) code_port
 
+-- This function is exported to python as _game.summarize (see its usages in game.py)
+port summarize: Int -> Int -> Int
+port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
 -- Send JSon to JS as dict with hero_x, hero_y
 port messageOut : Signal Json.Value

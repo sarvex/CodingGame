@@ -98,6 +98,7 @@
 </body>
 
 <script type="text/javascript">
+    window.ELM_API = {};
     jQuery.ajaxSetup({async:false});
     var filesToInclude = ["game.py", "_game.js"];
     for (var i in  filesToInclude) {
@@ -110,6 +111,10 @@
 
         var div = document.getElementById('game');
         var game = Elm.embed(Elm.Game, div, { code_port: "" });
+
+        //TODO: Ugly, global var way to export ELM api functions, rewrite
+        window.ELM_API.summarize = game.ports.summarize;
+
         var fun;
         var infoConstructor;
         game.ports.messageOut.subscribe(function(param){
