@@ -11,7 +11,7 @@ import Levels (..)
 
 -- incoming code source for player control
 
-port code_port : Signal Json.Value
+port code_port : Signal ({action:String, direction:String})
 
 
 
@@ -184,33 +184,29 @@ input = let delta = lift (\t -> t/20) (fps 25)
 --main  = lift2 render Window.dimensions gameState
 
 
-json_processor: (Dict.Dict String Json.Value) -> String
-json_processor d = concat[
-    "I will ",
-    (Json.toString "" (Dict.getOrFail "action" d)),
-    " to ",
-    (Json.toString "" (Dict.getOrFail "direction" d))]
-
-smart_text_obtainer: Json.Value -> String
-smart_text_obtainer json_value =
-        case json_value of
-            Json.String s -> s
-            Json.Object d ->  json_processor d
+record_to_action: ({action:String, direction:String})->Action
+record_to_action rec = 
+  if | rec.action == "forward" -> Forward
+     | rec.action == "jump" -> Jump
+     | otherwise -> None
 
 
-
-main = lift (\json->asText (smart_text_obtainer json)) code_port
+--main = lift (\json->asText (record_to_action json)) code_port
+main = lift (\s-> collage 1500 500 [
+    move(toFloat (round(inMilliseconds ((s/5) - 700) )), 60)(toForm (tiledImage  57 49 "imgs/man/man_walks_right.gif")),
+    move(-700, 0) (toForm (tiledImage  3000 75 "imgs/grass.png"))
+    ]) (foldp (+) 0 (fps 50))
 
 -- This function is exported to python as _game.summarize (see its usages in game.py)
 port summarize: Int -> Int -> Int
 port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
--- Send JSon to JS as dict with hero_x, hero_y
-port messageOut : Signal Json.Value
-port messageOut =  lift (\(x,y)->(Json.Object (Dict.fromList[
-    ("hero_x", Json.Number (toFloat x)),
-    ("hero_y", Json.Number (toFloat y)),
-    ("obstacle_front", Json.Boolean (x > 42)),
-    ("obstacle_back", Json.Boolean (x < 2)),
-    ("obstacle_top", Json.Boolean (y > 42))
-  ])))  Mouse.position
+-- Send Record
+port messageOut : Signal ({ hero_x:Int, hero_y:Int, obstacle_front:Bool, obstacle_back:Bool, obstacle_top:Bool })
+port messageOut =  lift (\(x,y)-> {
+  hero_x = x,
+  hero_y = y,
+  obstacle_front = (x > 42),
+  obstacle_back = (x <  2),
+  obstacle_top =  (y > 42)
+  }) Mouse.position
