@@ -195,6 +195,8 @@ step t dir g = physics t dir g
 --                            )
 --                         (groundBlocks w level)
 
+displayText: Float->Float->String -> Form
+displayText w h s = toText s |> Text.color (rgb 160 200 160) |> monospace |> (Text.height 40) |> leftAligned |> toForm |> move (0,  h/4) 
 
 -- DISPLAY
 render: (Int, Int)->Game->Element
@@ -212,7 +214,7 @@ render (w',h') game =
 
       --, rect w 50 |> filled (rgb 74 163 41)
                   --|> move (0, 24 - h/2)
-      ++ [ (if game.state == Before then toForm (plainText "Press Run to Start") 
+      ++ [ (if game.state == Before then displayText w h "Press Start"
                                     else (toForm (image (round hero.w) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
       )
 
