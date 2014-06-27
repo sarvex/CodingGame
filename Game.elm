@@ -179,8 +179,8 @@ physics t (dir_x, dir_y) g hero =
                          
               ,vx <- toFloat dir_x    -- walking speed
               ,dir <- if | dir_x < 0     -> Left
-                        | dir_x > 0     -> Right
-                        | otherwise   -> hero.dir
+                         | dir_x > 0     -> Right
+                         | otherwise   -> hero.dir
               ,falling <- isNothing hor_int
      } 
 
