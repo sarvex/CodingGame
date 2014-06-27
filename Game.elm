@@ -11,7 +11,7 @@ import Array
 import Debug
 
 
-big_eps = 5
+big_eps = 3
 eps = 0.00001
 
 
@@ -48,22 +48,22 @@ groundBlocks w level =
       (zip (level.groundy) (zip (0 :: level.groundx) (level.groundx ++ [w])  )) 
 
 
-intersectsHor: Float->Float->Segment->Bool
-intersectsHor x y (y', (x1, x2)) = (y<y'+eps) && (x>x1-eps) && (x<x2+eps)
+intersectsHor: Float->Float->Float->Segment->Bool
+intersectsHor x y s (y', (x1, x2)) = (y-big_eps<y' + eps) && ((x+s>x1-big_eps) || (x-s<x2+big_eps))
 
-intersectsVer: Float->Float->Segment->Bool
-intersectsVer x y (y', (x1, x2)) = (y<y'+eps) && (x>x1-eps) && (x<x2+eps)
+intersectsVer: Float->Float->Float->Segment->Bool
+intersectsVer x y s (y', (x1, x2)) = (y<y'+eps) && (((x+s>x1-eps) && (x+s<x2+eps)) || (x-s>x1-eps) && (x-s<x2+eps))  
 
 
-intersectBlocksHor: Float->Float->[Segment]->Maybe Segment
-intersectBlocksVer x y blocks = 
- let l = filter (intersectsHor x y) blocks
+intersectBlocksHor: Float->Float->Float->[Segment]->Maybe Segment
+intersectBlocksHor x y s blocks = 
+ let l = filter (intersectsHor x y s) blocks
  in if isEmpty l then Nothing else Just (head l)
 
 
-intersectBlocksVer: Float->Float->[Segment]->Maybe Segment
-intersectBlocksVer x y blocks = 
- let l = filter (intersectsVer x y) blocks
+intersectBlocksVer: Float->Float->Float->[Segment]->Maybe Segment
+intersectBlocksVer x y s blocks = 
+ let l = filter (intersectsVer x y s) blocks
  in if isEmpty l then Nothing else Just (head l)
 
 
@@ -167,8 +167,8 @@ physics t (dir_x, dir_y) g hero =
   let 
       s = hero.size/2
       b = groundBlocks g.w (cur_level g)
-      vert_int = intersectBlocksVert (hero.x - big_eps) (hero.y + t*hero.vy)  b
-      hor_int  = intersectBlocksHor (hero.x + t*hero.vx) (hero.y + big_eps) b
+      vert_int = intersectBlocksVer (hero.x - big_eps) (hero.y + t*hero.vy) s b
+      hor_int  = intersectBlocksHor (hero.x + t*hero.vx) (hero.y + big_eps) s b
   in { hero | x <- move_hor hero.x (t*hero.vx) s hor_int,
               y <- move_vert hero.y (t*hero.vy) s vert_int,
               vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
@@ -230,6 +230,7 @@ newinput delta action (w,h) = {delta = delta, action =  action, w = w, h = h}
 input: Signal Input
 input = let delta = lift (\t -> t/20) (fps 25)
         in sampleOn delta (lift3 newinput delta (lift record_to_action code_port) Window.dimensions)
+        --in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
 
 
 --- Main --- 
@@ -246,13 +247,6 @@ record_to_action rec =
 port code_port : Signal ({action:String, direction:String})
 
 
---main = lift (\json->asText (record_to_action json)) code_port
---main = lift (\s-> collage 1500 500 [
-    --move(toFloat (round(inMilliseconds ((s/5) - 700) )), 60)(toForm (tiledImage  57 49 "imgs/man/man_walks_right.gif")),
-    --move(-700, 0) (toForm (tiledImage  3000 75 "imgs/grass.png"))
-    --]) (foldp (+) 0 (fps 50))
-
-
 -- This function is exported to python as _game.summarize (see its usages in game.py)
 port summarize: Int -> Int -> Int
 port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
@@ -261,7 +255,7 @@ port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 obstacle_front g = 
    let s = g.hero.size/2
        b = groundBlocks g.w (cur_level g)
-       hor_int  = intersectBlocksHor (hero.x + s) (hero.y + big_eps) b
+       hor_int  = intersectBlocksHor hero.x hero.y (hero.size/2) b
    in not (isNothing hor_int)
 
 -- Send Record
