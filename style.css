@@ -68,3 +68,35 @@ body {
     overflow: auto;
     border: 0;
 }
+
+
+/*Console*/
+
+label.console, input#edoutput, label.console code {
+    background-color: #00232c;
+    color: cadetblue;
+    font-family: "Consolas", "Lucida Console", "Monaco", monospace;
+}
+
+label.console {
+    display: table;
+    width: 100%;
+    white-space: nowrap;
+    background-color: #00232c;
+    color: cadetblue;
+    border-top: dotted 1px cadetblue;
+    padding: 2px;
+}
+
+label.console code {
+    display: table-cell;
+    width: 1%;
+    padding-right: 5px;
+}
+input#edoutput {
+    display: table-cell;
+    height: 1rem !important;
+    border: 0;
+
+    width: 100%;
+}
