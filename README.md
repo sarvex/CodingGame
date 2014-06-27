@@ -2,5 +2,5 @@
 
 ### How do I get set up? ###
 
-* Launch elm -o Game.elm
+* Launch elm -o -m Game.elm
 * open index.html
