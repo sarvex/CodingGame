@@ -205,11 +205,10 @@ render (w',h') game =
   let hero = game.hero
       level = cur_level game
       (w,h) = (toFloat w', toFloat h')
-      verb = if | (hero.falling) -> "jump"
+      verb = if | (not hero.falling) -> "jump"
                 | hero.vx /= 0  -> "walk"
                 | otherwise     -> "stand"
-      -- src  = "imgs/man/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
-      src  = "imgs/man/walk/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
+      src  = "imgs/man/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
   in collage w' h'
       ([(toForm (image level.image.x level.image.y level.image.src))]
 
