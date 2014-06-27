@@ -2,7 +2,9 @@ var editor; // TODO: Get rid of global var. Use RequireJS?
 $(document).ready(function () {
     var output = $('#edoutput');
     var outf = function (text) {
-        output.text(output.text() + text);
+        if (text && text !== '\n') {
+            output.val(text);
+        }
     };
 
     var keymap = {
@@ -15,7 +17,7 @@ $(document).ready(function () {
                 $(document).trigger("codeLaunched", module);
             } catch (e) {
                 var error = e.toString() + "\n";
-                alert("importMainWithBody: "+ error);
+                alert("importMainWithBody: " + error);
                 outf(error);
             }
         },
