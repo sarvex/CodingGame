@@ -147,6 +147,8 @@
                 if (!infoConstructor) {
                     alert("failed to load game.GameInfo");
                 }
+                game.ports.code_port.send({action: "forward", direction: "forward"});
+
 
             } catch (ex) {
                 alert("Error codeLaunched:" + ex);
