@@ -20,9 +20,8 @@
 
     <!--Game logic in Elm-->
     <script src="build/Game.js" type="text/javascript"></script>
-    <script src="build/Levels.js" type="text/javascript"></script>
 
-
+    <title>Coding game</title>
 </head>
 
 <body>
@@ -41,38 +40,32 @@
     }
 
 </script>
+<div class="mainPanel">
+
+    <div id="game"></div>
+    <div class="page">
+        <div class="body">
+            <div class="main">
+
+                <div id="code-column-wrap">
+                    <div id="code-column">
+                        <form>
+                            <textarea id="code" style="width:500;height:30%"></textarea>
 
 
-<h1>Coding game</h1>
-
-<div class="wrapper">
-    <div class="mainPanel">
-        <div class="page">
-            <div class="body">
-                <div class="main">
-
-                    <div id="code-column-wrap">
-                        <div id="code-column">
-                            <form>
-                                <textarea id="code" style="width:500;height:30%"></textarea><br/>
-
-
-                                <button type="button" id="skulpt_run">Start</button>
-                            </form>
-                        </div>
+                            <button type="button" id="skulpt_run">Start</button>
+                        </form>
                     </div>
-
-
                 </div>
+
+
             </div>
         </div>
-
-        <div id="game"></div>
-
     </div>
-    <div class="hintPanel">
-        <iframe id="hintFrame" height="500"></iframe>
-    </div>
+
+</div>
+<div class="hintPanel">
+    <iframe id="hintFrame" height="500"></iframe>
 </div>
 </body>
 
@@ -90,6 +83,7 @@
      */
     function changeHint(nLevel) {
         $("#hintFrame").attr('src', "hints/" + nLevel + ".html");
+        document.title = 'Coding game, level ' + nLevel;
     }
 
 
