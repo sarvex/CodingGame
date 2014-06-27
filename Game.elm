@@ -7,10 +7,6 @@ import Json
 import Dict
 import Array
 
--- incoming code source for player control
-
-port code_port : Signal ({action:String, direction:String})
-
 
 big_eps = 5
 eps = 0.00001
@@ -21,7 +17,7 @@ type Levels = Array.Array Level
 
 type Segment = (Float, (Float, Float))
 
-first = {groundx = [800, 850], groundy = [50, 20, 100]}
+first = {groundx = [400, 500, 800, 850], groundy = [50, 80, 50, 20, 100]}
 --first = {groundx=[], groundy=[50]}
 
 levels: Levels
@@ -90,7 +86,7 @@ actionToArrows action =
      case action of
         Forward -> (1, 0)
         Backward -> (-1, 0)
-        Jump -> (0, 1)
+        Jump -> (1, 1)
         None -> (0, 0) -- Don't move 
 
 
@@ -220,7 +216,7 @@ newinput delta action (w,h) = {delta = delta, action =  action, w = w, h = h}
 
 input: Signal Input
 input = let delta = lift (\t -> t/20) (fps 25)
-        in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
+        in sampleOn delta (lift3 newinput delta (lift record_to_action code_port) Window.dimensions)
 
 
 --- Main --- 
@@ -232,6 +228,9 @@ record_to_action rec =
      | rec.action == "jump" -> Jump
      | otherwise -> None
 
+-- incoming code source for player control
+
+port code_port : Signal ({action:String, direction:String})
 
 
 --main = lift (\json->asText (record_to_action json)) code_port
