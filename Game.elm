@@ -81,9 +81,9 @@ data Action = Start | Forward | Backward | Jump | None
 data Direction = Right | Left
 
 
-type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float, h: Float}
+type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float, h: Float, falling: Bool}
 
-defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 30, h = 46}
+defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 30, h = 46, falling = False}
 
 
 type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float}
@@ -104,7 +104,7 @@ actionToArrows action =
 
 defaultHero: Level->Hero
 defaultHero level = 
-  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, w = 30, h=46}
+  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, w = 30, h=46, falling=False}
 
 
 dead: Float->Float->Float->Float->Level->Bool
@@ -171,16 +171,17 @@ physics t (dir_x, dir_y) g hero =
       b = groundBlocks g.w (cur_level g)
       vert_int = intersectBlocksVer hero.x (hero.y + t*hero.vy) w h b
       hor_int  = intersectBlocksHor (hero.x + t*hero.vx) hero.y w h b
-  in { hero | x <- move_hor hero.x (t*hero.vx) w h hor_int,
-              y <- move_vert hero.y (t*hero.vy) w h vert_int,
-              vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
+  in { hero |  x <- move_hor hero.x (t*hero.vx) w h hor_int
+              ,y <- move_vert hero.y (t*hero.vy) w h vert_int
+              ,vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
                      else if dir_y>0 then 5
-                     else 0 -- stand 
-                    ,     
-              vx <- toFloat dir_x,    -- walking speed
-              dir <- if | dir_x < 0     -> Left
+                     else 0           -- stand 
+                         
+              ,vx <- toFloat dir_x    -- walking speed
+              ,dir <- if | dir_x < 0     -> Left
                         | dir_x > 0     -> Right
                         | otherwise   -> hero.dir
+              ,falling <- isNothing hor_int
      } 
 
 step: Float -> (Int, Int) -> Game -> Hero-> Hero
@@ -204,8 +205,8 @@ render (w',h') game =
   let hero = game.hero
       level = cur_level game
       (w,h) = (toFloat w', toFloat h')
-      verb = if | hero.y  >  0 -> "jump"
-                | hero.vx /= 0 -> "walk"
+      verb = if | (hero.falling) -> "jump"
+                | hero.vx /= 0  -> "walk"
                 | otherwise     -> "stand"
       -- src  = "imgs/man/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
       src  = "imgs/man/walk/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
