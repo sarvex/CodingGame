@@ -1,5 +1,10 @@
 import _game
 
+LEFT = "left"
+TOP = "top"
+RIGHT = "right"
+
+
 class Command(object):
     command_name = None
     direction = None
@@ -10,7 +15,7 @@ class Command(object):
 
 
 class Jump(Command):
-    def __init__(self, direction):
+    def __init__(self, direction=TOP):
         self.direction = direction
 
     def _get_dict(self):
@@ -19,18 +24,21 @@ class Jump(Command):
 
 class Left(Command):
     command_name = "turn"
-    direction = "left"
+    direction = LEFT
 
 
 class Right(Command):
     command_name = "turn"
-    direction = "right"
+    direction = RIGHT
 
 
 class GameInfo(object):
-    def __init__(self, hero_x, hero_y):
-        self.hero_x = hero_x
-        self.hero_y = hero_y
+    def __init__(self, params_dic):
+        self.hero_x = params_dic['hero_x']
+        self.hero_y = params_dic['hero_y']
+        self.obstacle_front = params_dic['obstacle_front']
+        self.obstacle_back = params_dic['obstacle_back']
+        self.obstacle_top = params_dic['obstacle_top']
 
     def get_coords_sum(self):
         return _game.summarize(self.hero_x, self.hero_y)

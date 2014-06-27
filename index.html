@@ -121,7 +121,7 @@
             try {
                 if (fun) {
 
-                    var heroInfo = Sk.misceval.callsim(infoConstructor, param.hero_x, param.hero_y);
+                    var heroInfo = Sk.misceval.callsim(infoConstructor, Sk.ffi.remapToPy(param));
                     var command = Sk.misceval.callsim(fun, heroInfo);
                     var result = Sk.ffi.remapToJs(Sk.misceval.callsim(command.tp$getattr("_get_dict")));
 
