@@ -15,12 +15,12 @@ big_eps = 7
 eps = 0.0001
 
 
-type Level = {image: {x: Int, y: Int, src: String}, groundx: [Float], groundy: [Float]}
+type Level = {image: {x: Int, y: Int, src: String}, groundx: [Float], groundy: [Float], water: [Segment]}
 type Levels = Array.Array Level
 
 type Segment = (Float, (Float, Float))
 
-first = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100]}
+first = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(30, (450, 499))]}
 --first = {groundx=[], groundy=[50]}
 
 levels: Levels
@@ -188,13 +188,20 @@ step: Float -> (Int, Int) -> Game -> Hero-> Hero
 step t dir g = physics t dir g
 
 
+drawSegments: Float -> Float -> Color -> [Segment] -> [Form]
+drawSegments w h c s= map (\(y, (x1, x2)) -> rect (x2-x1) y
+                            |> filled c
+                            |> move (x1 + (x2-x1)/2 - w/2, y/2 - h/2)
+                            )
+                          s
 
---drawGround: Float -> Float -> Level -> [Form]
---drawGround w h level = map (\(y, (x1, x2)) -> rect (x2-x1) y
---                            |> filled (rgb 74 163 41)
---                            |> move (x1 + (x2-x1)/2 - w/2, y/2 - h/2)
---                            )
---                         (groundBlocks w level)
+--drawGround: Float->Float->Level -> [Form]
+--drawGround w h l = drawSegments w h (rgb 74 163 41) (groundBlocks w l)
+
+
+drawWater: Float->Float->[Segment] -> [Form]
+drawWater w h s = map (alpha 0.4) (drawSegments w h (rgb 0 0 245) s) 
+
 
 displayText: Float->Float->String -> Form
 displayText w h s = toText s |> Text.color (rgb 160 200 160) |> monospace |> (Text.height 40) |> leftAligned |> toForm |> move (0,  h/4) 
@@ -216,6 +223,7 @@ render (w',h') game =
                   --|> move (0, 24 - h/2)
       ++ [ (if game.state == Before then displayText w h "Press Start"
                                     else (toForm (image (round hero.w) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
+      ++ drawWater w h level.water
       )
 
 encodeArrows {x, y} = if | x >0 -> Forward
