@@ -15,12 +15,12 @@ big_eps = 7
 eps = 0.0001
 
 
-type Level = {groundx: [Float], groundy: [Float]}
+type Level = {image: {x: Int, y: Int, src: String}, groundx: [Float], groundy: [Float]}
 type Levels = Array.Array Level
 
 type Segment = (Float, (Float, Float))
 
-first = {groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100]}
+first = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100]}
 --first = {groundx=[], groundy=[50]}
 
 levels: Levels
@@ -208,7 +208,7 @@ render (w',h') game =
       -- src  = "imgs/man/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
       src  = "imgs/man/walk/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
   in collage w' h'
-      ([(toForm (image 751 302 "imgs/levels/1.jpg"))]
+      ([(toForm (image level.image.x level.image.y level.image.src))]
 
       --, rect w 50 |> filled (rgb 74 163 41)
                   --|> move (0, 24 - h/2)
