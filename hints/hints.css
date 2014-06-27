@@ -1,0 +1,39 @@
+body {
+    background-color: white;
+    padding: 5px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    background: url("../imgs/back.jpg") repeat;
+}
+
+h1 {
+    text-align: center;
+    text-decoration: underline;
+    color: #092e20 !important;
+    font-family: "Trebuchet MS", sans-serif;
+}
+
+h2 {
+    color: #487858;
+}
+
+code {
+    background-color: #E0FFB8;
+    padding: 0.05rem;
+    font-size: 0.9rem;
+}
+
+dl {
+    margin: 0;
+}
+
+dd {
+    margin-top: 1rem;
+}
+
+dt {
+    margin-left: 5rem;
+}
+
+p, dl {
+    font-size: 0.8rem;
+}

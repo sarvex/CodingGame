@@ -1,0 +1,74 @@
+html {
+    overflow-y: hidden;
+}
+
+h1 {
+    text-align: center;
+}
+
+#skulpt_run {
+    background-color: #229922;
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
+body {
+    background: url("imgs/back.jpg") repeat;
+}
+
+.wrapper {
+    display: table;
+    width: 100%;
+    height: 100%;
+
+}
+
+#column-code-wrap {
+    float: top;
+    height: 100%;
+}
+
+#column-code {
+    margin-bottom: 50px;
+}
+
+#game {
+    width: 750px;
+    height: 300px;
+    background-color: white;
+    border: 2px dashed #000000;
+    display: block;
+    margin-left: 15px;
+    margin-right: auto;
+}
+
+.page {
+    margin-left: 15px !important;
+}
+
+.mainPanel {
+    width: 800px;
+}
+.mainPanel, .hintPanel {
+    display: table-cell;
+    vertical-align: top;
+}
+
+.hintPanel {
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: left;
+}
+
+.hintPanel iframe {
+    width: 100%;
+    height: 80%;
+    overflow: auto;
+    border: 0;
+}
