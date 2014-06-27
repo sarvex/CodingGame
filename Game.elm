@@ -8,6 +8,9 @@ import Dict
 import Array
 
 
+import Debug
+
+
 big_eps = 5
 eps = 0.00001
 
@@ -45,13 +48,22 @@ groundBlocks w level =
       (zip (level.groundy) (zip (0 :: level.groundx) (level.groundx ++ [w])  )) 
 
 
-intersects: Float->Float->Segment->Bool
-intersects x y (y', (x1, x2)) = (y<y'+eps) && (x>x1-eps) && (x<x2+eps)
+intersectsHor: Float->Float->Segment->Bool
+intersectsHor x y (y', (x1, x2)) = (y<y'+eps) && (x>x1-eps) && (x<x2+eps)
+
+intersectsVer: Float->Float->Segment->Bool
+intersectsVer x y (y', (x1, x2)) = (y<y'+eps) && (x>x1-eps) && (x<x2+eps)
 
 
-intersectBlocks: Float->Float->[Segment]->Maybe Segment
-intersectBlocks x y blocks = 
- let l = filter (intersects x y) blocks
+intersectBlocksHor: Float->Float->[Segment]->Maybe Segment
+intersectBlocksVer x y blocks = 
+ let l = filter (intersectsHor x y) blocks
+ in if isEmpty l then Nothing else Just (head l)
+
+
+intersectBlocksVer: Float->Float->[Segment]->Maybe Segment
+intersectBlocksVer x y blocks = 
+ let l = filter (intersectsVer x y) blocks
  in if isEmpty l then Nothing else Just (head l)
 
 
@@ -155,8 +167,8 @@ physics t (dir_x, dir_y) g hero =
   let 
       s = hero.size/2
       b = groundBlocks g.w (cur_level g)
-      vert_int = intersectBlocks (hero.x - big_eps) (hero.y + t*hero.vy)  b
-      hor_int  = intersectBlocks (hero.x + t*hero.vx) (hero.y + big_eps) b
+      vert_int = intersectBlocksVert (hero.x - big_eps) (hero.y + t*hero.vy)  b
+      hor_int  = intersectBlocksHor (hero.x + t*hero.vx) (hero.y + big_eps) b
   in { hero | x <- move_hor hero.x (t*hero.vx) s hor_int,
               y <- move_vert hero.y (t*hero.vy) s vert_int,
               vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
@@ -245,12 +257,15 @@ port code_port : Signal ({action:String, direction:String})
 port summarize: Int -> Int -> Int
 port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
+
+obstacle_front g = 
+   let s = g.hero.size/2
+       b = groundBlocks g.w (cur_level g)
+       hor_int  = intersectBlocksHor (hero.x + s) (hero.y + big_eps) b
+   in not (isNothing hor_int)
+
 -- Send Record
 port messageOut : Signal ({ hero_x:Int, hero_y:Int, obstacle_front:Bool, obstacle_back:Bool, obstacle_top:Bool })
-port messageOut =  lift (\(x,y)-> {
-  hero_x = x,
-  hero_y = y,
-  obstacle_front = (x > 42),
-  obstacle_back = (x <  2),
-  obstacle_top =  (y > 42)
-  }) Mouse.position
+port messageOut =  lift (\g -> Debug.log "Data" {hero_x = round g.hero.x,  hero_y = round g.hero.y, obstacle_front = obstacle_front g, obstacle_back = False, obstacle_top = False}) gameState
+
+
