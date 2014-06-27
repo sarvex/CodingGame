@@ -98,10 +98,12 @@
 </body>
 
 <script type="text/javascript">
+    window.ELM_API = {};
     jQuery.ajaxSetup({async:false});
-    // TODO: Fix
-    Sk.builtinFiles["files"]['src/lib/game.py'] = jQuery.get("game.py").responseText;
-
+    var filesToInclude = ["game.py", "_game.js"];
+    for (var i in  filesToInclude) {
+        Sk.builtinFiles["files"]['src/lib/' + filesToInclude[i]] = jQuery.get(filesToInclude[i]).responseText;
+    }
 
     $(document).ready(function () {
         editor.setValue(jQuery.get("initial_code.py").responseText);
@@ -109,6 +111,10 @@
 
         var div = document.getElementById('game');
         var game = Elm.embed(Elm.Game, div, { code_port: "" });
+
+        //TODO: Ugly, global var way to export ELM api functions, rewrite
+        window.ELM_API.summarize = game.ports.summarize;
+
         var fun;
         var infoConstructor;
         game.ports.messageOut.subscribe(function(param){
