@@ -176,7 +176,8 @@ record_to_action rec =
      | otherwise -> None
 
 
-main = lift (\json->asText (record_to_action json)) code_port
+--main = lift (\json->asText (record_to_action json)) code_port
+main = lift (\s-> collage 500 500 [move(toFloat (round(inMilliseconds (s/5))), 10)(toForm (image 57 49 "imgs/man/man_walks_right.gif"))]) (foldp (+) 0 (fps 50))
 
 -- This function is exported to python as _game.summarize (see its usages in game.py)
 port summarize: Int -> Int -> Int
