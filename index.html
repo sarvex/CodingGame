@@ -99,9 +99,10 @@
 
 <script type="text/javascript">
     jQuery.ajaxSetup({async:false});
-    // TODO: Fix
-    Sk.builtinFiles["files"]['src/lib/game.py'] = jQuery.get("game.py").responseText;
-
+    var filesToInclude = ["game.py", "_game.js"];
+    for (var i in  filesToInclude) {
+        Sk.builtinFiles["files"]['src/lib/' + filesToInclude[i]] = jQuery.get(filesToInclude[i]).responseText;
+    }
 
     $(document).ready(function () {
         editor.setValue(jQuery.get("initial_code.py").responseText);

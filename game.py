@@ -1,3 +1,5 @@
+import _game
+
 class Command(object):
     command_name = None
     direction = None
@@ -29,3 +31,6 @@ class GameInfo(object):
     def __init__(self, hero_x, hero_y):
         self.hero_x = hero_x
         self.hero_y = hero_y
+
+    def get_coords_sum(self):
+        return _game.summarize(self.hero_x, self.hero_y)
