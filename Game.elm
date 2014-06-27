@@ -209,5 +209,8 @@ port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 port messageOut : Signal Json.Value
 port messageOut =  lift (\(x,y)->(Json.Object (Dict.fromList[
     ("hero_x", Json.Number (toFloat x)),
-    ("hero_y", Json.Number (toFloat y))
+    ("hero_y", Json.Number (toFloat y)),
+    ("obstacle_front", Json.Boolean (x > 42)),
+    ("obstacle_back", Json.Boolean (x < 2)),
+    ("obstacle_top", Json.Boolean (y > 42))
   ])))  Mouse.position
