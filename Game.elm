@@ -181,7 +181,7 @@ physics t (dir_x, dir_y) g hero =
               ,dir <- if | dir_x < 0     -> Left
                          | dir_x > 0     -> Right
                          | otherwise   -> hero.dir
-              ,falling <- isNothing vert_int && ((Debug.log "vy" hero.vy) < -1.5)
+              ,falling <- isNothing vert_int && (hero.vy < -1.5)
      } 
 
 step: Float -> (Int, Int) -> Game -> Hero-> Hero
@@ -268,6 +268,6 @@ obstacle_front g =
 
 -- Send Record
 port messageOut : Signal ({ hero_x:Int, hero_y:Int, obstacle_front:Bool, obstacle_back:Bool, obstacle_top:Bool })
-port messageOut =  lift (\g -> Debug.log "Data" {hero_x = round g.hero.x,  hero_y = round g.hero.y, obstacle_front = obstacle_front g, obstacle_back = False, obstacle_top = False}) gameState
+port messageOut =  lift (\g -> {hero_x = round g.hero.x,  hero_y = round g.hero.y, obstacle_front = obstacle_front g, obstacle_back = False, obstacle_top = False}) gameState
 
 
