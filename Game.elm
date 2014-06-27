@@ -190,12 +190,12 @@ main = lift (\json->asText (smart_text_obtainer json)) code_port
 port summarize: Int -> Int -> Int
 port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
--- Send JSon to JS as dict with hero_x, hero_y
-port messageOut : Signal Json.Value
-port messageOut =  lift (\(x,y)->(Json.Object (Dict.fromList[
-    ("hero_x", Json.Number (toFloat x)),
-    ("hero_y", Json.Number (toFloat y)),
-    ("obstacle_front", Json.Boolean (x > 42)),
-    ("obstacle_back", Json.Boolean (x < 2)),
-    ("obstacle_top", Json.Boolean (y > 42))
-  ])))  Mouse.position
+-- Send Record
+port messageOut : Signal ({ hero_x:Int, hero_y:Int, obstacle_front:Bool, obstacle_back:Bool, obstacle_top:Bool })
+port messageOut =  lift (\(x,y)-> {
+  hero_x = x,
+  hero_y = y,
+  obstacle_front = (x > 42),
+  obstacle_back = (x <  2),
+  obstacle_top =  (y > 42)
+  }) Mouse.position
