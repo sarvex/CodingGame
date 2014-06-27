@@ -23,3 +23,9 @@ class Left(Command):
 class Right(Command):
     command_name = "turn"
     direction = "right"
+
+
+class GameInfo(object):
+    def __init__(self, hero_x, hero_y):
+        self.hero_x = hero_x
+        self.hero_y = hero_y

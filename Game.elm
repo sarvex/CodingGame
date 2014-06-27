@@ -211,5 +211,11 @@ smart_text_obtainer json_value =
 
 
 main = lift (\json->asText (smart_text_obtainer json)) code_port
-port messageOut : Signal Int
-port messageOut = Mouse.x
+
+
+-- Send JSon to JS as dict with hero_x, hero_y
+port messageOut : Signal Json.Value
+port messageOut =  lift (\(x,y)->(Json.Object (Dict.fromList[
+    ("hero_x", Json.Number (toFloat x)),
+    ("hero_y", Json.Number (toFloat y))
+  ])))  Mouse.position
