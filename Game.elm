@@ -11,8 +11,8 @@ import Array
 import Debug
 
 
-big_eps = 3
-eps = 0.00001
+big_eps = 7
+eps = 0.0001
 
 
 type Level = {groundx: [Float], groundy: [Float]}
@@ -48,22 +48,22 @@ groundBlocks w level =
       (zip (level.groundy) (zip (0 :: level.groundx) (level.groundx ++ [w])  )) 
 
 
-intersectsHor: Float->Float->Float->Segment->Bool
-intersectsHor x y s (y', (x1, x2)) = (y-big_eps<y' + eps) && ((x+s>x1-big_eps) || (x-s<x2+big_eps))
+intersectsHor: Float->Float->Float->Float->Segment->Bool
+intersectsHor x y w h (y', (x1, x2)) = (y - h + big_eps<y') && (((x+w>x1 - eps) && (x+ w<x2+eps)) || ((x-w>x1-eps) && (x-w<x2+eps)))
 
-intersectsVer: Float->Float->Float->Segment->Bool
-intersectsVer x y s (y', (x1, x2)) = (y<y'+eps) && (((x+s>x1-eps) && (x+s<x2+eps)) || (x-s>x1-eps) && (x-s<x2+eps))  
+intersectsVer: Float->Float->Float->Float->Segment->Bool
+intersectsVer x y w h (y', (x1, x2)) = (y - h<y'+eps) && (((x+w>x1+big_eps) && (x+w<x2-big_eps)) || ((x-w>x1+big_eps) && (x-w<x2-big_eps)))  
 
 
-intersectBlocksHor: Float->Float->Float->[Segment]->Maybe Segment
-intersectBlocksHor x y s blocks = 
- let l = filter (intersectsHor x y s) blocks
+intersectBlocksHor: Float->Float->Float->Float->[Segment]->Maybe Segment
+intersectBlocksHor x y w h blocks = 
+ let l = filter (intersectsHor x y w h) blocks
  in if isEmpty l then Nothing else Just (head l)
 
 
-intersectBlocksVer: Float->Float->Float->[Segment]->Maybe Segment
-intersectBlocksVer x y s blocks = 
- let l = filter (intersectsVer x y s) blocks
+intersectBlocksVer: Float->Float->Float->Float->[Segment]->Maybe Segment
+intersectBlocksVer x y w h blocks = 
+ let l = filter (intersectsVer x y w h) blocks
  in if isEmpty l then Nothing else Just (head l)
 
 
@@ -81,9 +81,9 @@ data Action = Forward | Backward | Jump | None
 data Direction = Right | Left
 
 
-type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, size: Float}
+type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float, h: Float}
 
-hero = { x=0, y=0, vx=0, vy=0, dir=Right, size = 35}
+hero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 20, h = 35}
 
 
 type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float}
@@ -104,7 +104,7 @@ actionToArrows action =
 
 defaultHero: Level->Hero
 defaultHero level = 
-  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, size=35}
+  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, w = 20, h=35}
 
 
 dead: Float->Float->Float->Float->Level->Bool
@@ -149,28 +149,29 @@ gameState = foldp stepGame defaultGame input
 -- Physics --
 
 
-move_hor: Float->Float->Float->Maybe Segment->Float
-move_hor x dx s seg = case seg of
+move_hor: Float->Float->Float->Float->Maybe Segment->Float
+move_hor x dx w h seg = case seg of
                      Nothing -> x + dx
-                     Just (y, (x1, x2)) -> if | dx<0 && (x>x2-eps) -> max (x2) (x + dx)
-                                              | dx>0 && (x<x1+eps) -> min (x1) (x + dx)
+                     Just (y, (x1, x2)) -> if | dx<0 && (x-w<x2-eps) -> max (x2+w) (x + dx)
+                                              | dx>0 && (x+w>x1+eps) -> min (x1-w) (x + dx)
                                               | otherwise -> x + dx 
-move_vert: Float->Float->Float->Maybe Segment->Float
-move_vert y dy s seg = case seg of
+move_vert: Float->Float->Float->Float->Maybe Segment->Float
+move_vert y dy w h seg = case seg of
                      Nothing -> y + dy
-                     Just (y', (x1, x2)) -> max (y') (y + dy)
+                     Just (y', (x1, x2)) -> max (y'+h) (y + dy)
                                              
 
 
 physics: Float->(Int, Int)->Game->Hero->Hero
 physics t (dir_x, dir_y) g hero =  
   let 
-      s = hero.size/2
+      w = hero.w/2
+      h = hero.h/2
       b = groundBlocks g.w (cur_level g)
-      vert_int = intersectBlocksVer (hero.x - big_eps) (hero.y + t*hero.vy) s b
-      hor_int  = intersectBlocksHor (hero.x + t*hero.vx) (hero.y + big_eps) s b
-  in { hero | x <- move_hor hero.x (t*hero.vx) s hor_int,
-              y <- move_vert hero.y (t*hero.vy) s vert_int,
+      vert_int = intersectBlocksVer hero.x (hero.y + t*hero.vy) w h b
+      hor_int  = intersectBlocksHor (hero.x + t*hero.vx) hero.y w h b
+  in { hero | x <- move_hor hero.x (t*hero.vx) w h hor_int,
+              y <- move_vert hero.y (t*hero.vy) w h vert_int,
               vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
                      else if dir_y>0 then 5
                      else 0 -- stand 
@@ -211,7 +212,7 @@ render (w',h') game =
       --, rect w 50 |> filled (rgb 74 163 41)
                   --|> move (0, 24 - h/2)
       ++ [ (if game.state == Before then toForm (plainText "Press Run to Start") 
-                                    else (toForm (image (round hero.size) (round hero.size) src) |> move (hero.x - w/2, hero.y + hero.size/2 - h/2)))]
+                                    else (toForm (image (round hero.h) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
       )
 
 encodeArrows {x, y} = if | x >0 -> Forward
@@ -229,8 +230,8 @@ newinput delta action (w,h) = {delta = delta, action =  action, w = w, h = h}
 
 input: Signal Input
 input = let delta = lift (\t -> t/20) (fps 25)
-        in sampleOn delta (lift3 newinput delta (lift record_to_action code_port) Window.dimensions)
-        --in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
+        --in sampleOn delta (lift3 newinput delta (lift record_to_action code_port) Window.dimensions)
+        in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
 
 
 --- Main --- 
@@ -253,9 +254,9 @@ port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
 
 obstacle_front g = 
-   let s = g.hero.size/2
+   let s = g.hero.h/2
        b = groundBlocks g.w (cur_level g)
-       hor_int  = intersectBlocksHor hero.x hero.y (hero.size/2) b
+       hor_int  = intersectBlocksHor hero.x hero.y (hero.w/2) (hero.h/2)  b
    in not (isNothing hor_int)
 
 -- Send Record
