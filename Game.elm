@@ -169,8 +169,8 @@ physics t (dir_x, dir_y) g hero =
       w = hero.w/2
       h = hero.h/2
       b = groundBlocks g.w (cur_level g)
-      vert_int = intersectBlocksVer hero.x (hero.y + t*hero.vy) w h b
-      hor_int  = intersectBlocksHor (hero.x + t*hero.vx) hero.y w h b
+      vert_int = intersectBlocksVer hero.x (hero.y + t*hero.vy) w h b -- barrier for vertical move
+      hor_int  = intersectBlocksHor (hero.x + t*hero.vx) hero.y w h b -- barrier for horizontal move
   in { hero |  x <- move_hor hero.x (t*hero.vx) w h hor_int
               ,y <- move_vert hero.y (t*hero.vy) w h vert_int
               ,vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
@@ -181,7 +181,7 @@ physics t (dir_x, dir_y) g hero =
               ,dir <- if | dir_x < 0     -> Left
                          | dir_x > 0     -> Right
                          | otherwise   -> hero.dir
-              ,falling <- isNothing hor_int
+              ,falling <- isNothing vert_int && (hero.vy < -1.5)
      } 
 
 step: Float -> (Int, Int) -> Game -> Hero-> Hero
@@ -205,7 +205,7 @@ render (w',h') game =
   let hero = game.hero
       level = cur_level game
       (w,h) = (toFloat w', toFloat h')
-      verb = if | (not hero.falling) -> "jump"
+      verb = if | (hero.falling) -> "jump"
                 | hero.vx /= 0  -> "walk"
                 | otherwise     -> "stand"
       src  = "imgs/man/" ++ verb ++ "/" ++ (if hero.dir == Right then "right" else "left") ++ ".gif"
@@ -268,6 +268,6 @@ obstacle_front g =
 
 -- Send Record
 port messageOut : Signal ({ hero_x:Int, hero_y:Int, obstacle_front:Bool, obstacle_back:Bool, obstacle_top:Bool })
-port messageOut =  lift (\g -> Debug.log "Data" {hero_x = round g.hero.x,  hero_y = round g.hero.y, obstacle_front = obstacle_front g, obstacle_back = False, obstacle_top = False}) gameState
+port messageOut =  lift (\g -> {hero_x = round g.hero.x,  hero_y = round g.hero.y, obstacle_front = obstacle_front g, obstacle_back = False, obstacle_top = False}) gameState
 
 
