@@ -7,11 +7,56 @@ import Json
 import Dict
 import Array
 
-import Levels (..)
-
 -- incoming code source for player control
 
 port code_port : Signal ({action:String, direction:String})
+
+
+big_eps = 5
+eps = 0.00001
+
+
+type Level = {groundx: [Float], groundy: [Float]}
+type Levels = Array.Array Level
+
+type Segment = (Float, (Float, Float))
+
+first = {groundx = [800, 850], groundy = [50, 20, 100]}
+--first = {groundx=[], groundy=[50]}
+
+levels: Levels
+levels = Array.fromList [ 
+{- each level is a record with following elements:
+   1) list of ints representing the ground by segments:
+      first int - y of the horizontal segment that starts at x=0
+      second int - x of the vertical segment
+      third int - y of the next horizontal segment
+      an so on
+      the last segment is horizontal ending at x = w
+   2) list of floating polygons represented by list of n points (x, y), where n>=3
+-}
+   first 
+   ]
+
+
+get_level: Int->Array.Array Level->Level 
+get_level level_num levels = 
+  Array.getOrElse first level_num levels --todo handle maybe
+  
+
+groundBlocks: Float->Level->[Segment]
+groundBlocks w level = 
+      (zip (level.groundy) (zip (0 :: level.groundx) (level.groundx ++ [w])  )) 
+
+
+intersects: Float->Float->Segment->Bool
+intersects x y (y', (x1, x2)) = (y<y'+eps) && (x>x1-eps) && (x<x2+eps)
+
+
+intersectBlocks: Float->Float->[Segment]->Maybe Segment
+intersectBlocks x y blocks = 
+ let l = filter (intersects x y) blocks
+ in if isEmpty l then Nothing else Just (head l)
 
 
 
@@ -51,7 +96,7 @@ actionToArrows action =
 
 defaultHero: Level->Hero
 defaultHero level = 
-  {x = 0, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, size=35}
+  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, size=35}
 
 
 dead: Float->Float->Float->Float->Level->Bool
@@ -63,9 +108,6 @@ win: Float->Float->Float->Float->Level->Bool
 win x y w h level = 
    if x>w then True else False
 
-get_level: Int -> Array.Array Level -> Level 
-get_level level_num levels = 
-  Array.getOrFail level_num levels --todo handle maybe
 
 cur_level: Game->Level
 cur_level g = 
@@ -98,34 +140,33 @@ gameState = foldp stepGame defaultGame input
 
 -- Physics --
 
-corpus hero v = 
-    if v <0 then -hero.size/2 else hero.size 
 
-move_hor: Float->Float->Maybe Segment->Float
-move_hor x dx s = case s of
+move_hor: Float->Float->Float->Maybe Segment->Float
+move_hor x dx s seg = case seg of
                      Nothing -> x + dx
-                     Just (y, (x1, x2)) -> if | dx<0 -> x2
-                                             | dx>0 -> x1
-                                             | otherwise -> x + dx 
-move_vert: Float->Float->Maybe Segment->Float
-move_vert y dy s = case s of
+                     Just (y, (x1, x2)) -> if | dx<0 && (x>x2-eps) -> max (x2) (x + dx)
+                                              | dx>0 && (x<x1+eps) -> min (x1) (x + dx)
+                                              | otherwise -> x + dx 
+move_vert: Float->Float->Float->Maybe Segment->Float
+move_vert y dy s seg = case seg of
                      Nothing -> y + dy
-                     Just (y', (x1, x2)) -> if  dy<0 then y' else y + dy
+                     Just (y', (x1, x2)) -> max (y') (y + dy)
                                              
 
 
 physics: Float->(Int, Int)->Game->Hero->Hero
 physics t (dir_x, dir_y) g hero =  
-  let m_v = { hero | y <- hero.y + t*hero.vy }
-      m_h  = { hero | x <- hero.x + t*hero.vx }
+  let 
+      s = hero.size/2
       b = groundBlocks g.w (cur_level g)
-      vert_int = intersectBlocks m_v.x (m_v.y + (corpus m_v m_v.y))  b
-      hor_int  = intersectBlocks (m_h.x + (corpus m_h m_h.x)) m_h.y b
-  in { hero | x <- move_hor hero.x (t*hero.vx) hor_int,
-              y <- move_vert hero.y (t*hero.vy) vert_int,
+      vert_int = intersectBlocks (hero.x - big_eps) (hero.y + t*hero.vy)  b
+      hor_int  = intersectBlocks (hero.x + t*hero.vx) (hero.y + big_eps) b
+  in { hero | x <- move_hor hero.x (t*hero.vx) s hor_int,
+              y <- move_vert hero.y (t*hero.vy) s vert_int,
               vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
-                    else if dir_y>0 then 5 -- jump
-                    else 0, -- stand
+                     else if dir_y>0 then 5
+                     else 0 -- stand 
+                    ,     
               vx <- toFloat dir_x,    -- walking speed
               dir <- if | dir_x < 0     -> Left
                         | dir_x > 0     -> Right
@@ -161,7 +202,7 @@ render (w',h') game =
       --, rect w 50 |> filled (rgb 74 163 41)
                   --|> move (0, 24 - h/2)
       ++ [ (if game.state == Before then toForm (plainText "Press Run to Start") 
-                                    else (toForm (image (round hero.size) (round hero.size) src) |> move (hero.x, hero.y + hero.size/2 - h/2)))]
+                                    else (toForm (image (round hero.size) (round hero.size) src) |> move (hero.x - w/2, hero.y + hero.size/2 - h/2)))]
       )
 
 encodeArrows {x, y} = if | x >0 -> Forward
@@ -175,14 +216,15 @@ type Input = {delta: Float, action: Action, w: Int, h: Int}
 newinput:Float->Action->(Int, Int)->Input
 newinput delta action (w,h) = {delta = delta, action =  action, w = w, h = h}
 
--- MARIO
+-- Input 
 
 input: Signal Input
 input = let delta = lift (\t -> t/20) (fps 25)
         in sampleOn delta (lift3 newinput delta (lift encodeArrows Keyboard.arrows) Window.dimensions)
 
---main  = lift2 render Window.dimensions gameState
 
+--- Main --- 
+main  = lift2 render Window.dimensions gameState
 
 record_to_action: ({action:String, direction:String})->Action
 record_to_action rec = 
@@ -191,11 +233,13 @@ record_to_action rec =
      | otherwise -> None
 
 
+
 --main = lift (\json->asText (record_to_action json)) code_port
-main = lift (\s-> collage 1500 500 [
-    move(toFloat (round(inMilliseconds ((s/5) - 700) )), 60)(toForm (tiledImage  57 49 "imgs/man/man_walks_right.gif")),
-    move(-700, 0) (toForm (tiledImage  3000 75 "imgs/grass.png"))
-    ]) (foldp (+) 0 (fps 50))
+--main = lift (\s-> collage 1500 500 [
+    --move(toFloat (round(inMilliseconds ((s/5) - 700) )), 60)(toForm (tiledImage  57 49 "imgs/man/man_walks_right.gif")),
+    --move(-700, 0) (toForm (tiledImage  3000 75 "imgs/grass.png"))
+    --]) (foldp (+) 0 (fps 50))
+
 
 -- This function is exported to python as _game.summarize (see its usages in game.py)
 port summarize: Int -> Int -> Int
