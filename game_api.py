@@ -52,7 +52,7 @@ class Sensors(object):
         self.material = params_dic['material']
 
 
-    def is_barrier_near(self):
+    def is_blocked(self):
         return self.pick_material(1, 0) == 'GROUND'
 
     def pick_material(self, x, y):

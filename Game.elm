@@ -161,8 +161,8 @@ gameState = foldp stepGame defaultGame input
 move_hor: Float->Float->Float->Float->Maybe Segment->Float
 move_hor x dx w h seg = case seg of
                      Nothing -> x + dx
-                     Just (y, (x1, x2)) -> if | dx<0 && (x-w<x2-eps) -> max (x2+w) (x + dx)
-                                              | dx>0 && (x+w>x1+eps) -> min (x1-w) (x + dx)
+                     Just (y, (x1, x2)) -> if | dx<0 && (x-w<x2-eps) && (x2-x<w) -> max (x2+w) (x + dx)
+                                              | dx>0 && (x+w>x1+eps) && (x-x1<w)-> min (x1-w) (x + dx)
                                               | otherwise -> x + dx 
 move_vert: Float->Float->Float->Float->Maybe Segment->Float
 move_vert y dy w h seg = case seg of
