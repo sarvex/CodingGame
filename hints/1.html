@@ -18,7 +18,7 @@
 <p>
     That is the main function of the robo brain. You can return either <code>Jump()</code> or <code>Run()</code>
     for example to make robo jump or run forward.
-    You may investigate your <code>robo</code> argument. It provides access to all robo subsystems: gps, sensors, laser.
+    You may investigate your <code>robo</code> argument. It provides access to all robo subsystems: <code>gps</code>, <code>sensors</code>, <code>laser</code>.
 </p>
 
 The <code>robo</code> argument has the following functions and fields:
@@ -28,10 +28,10 @@ The <code>robo</code> argument has the following functions and fields:
     <dd><code>gps.y</code></dd>
     <dt>Robo vertincal position</dt>
     <dd><code>sensors.is_blocked()</code></dd>
-    <dt>Function that returns True if there is the sensor is blocked by a barrier in front of the robo. You can use it to detect if there is an
+    <dt>Function that returns <code>True</code> if there is the sensor is blocked by a barrier in front of the robo and <code>False</code> otherwise. You can use it to detect if there is an
         obstacles on your way.</dt>
     <dd><code>sensors.pick_material(x, y)</code></dd>
-    <dt>This sensor function returns material that is located near the robo.
+    <dt>This sensor function returns material that is located near the robo. Possible materials are: <code>'WATER'</code>, <code>'GROUND'</code> etc
         <br/>It has 2 arguments <code>x, y</code> that specify the direction to pick material from.
         <br/><code>1, 1</code> is for picking from <em>upper</em> forward direction
         <br/><code>1, 0</code> is for picking from <em>straight</em> forward direction

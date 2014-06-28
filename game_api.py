@@ -51,7 +51,6 @@ class Sensors(object):
         # (1, 1), (1, 0), (1, -1)
         self.material = params_dic['material']
 
-
     def is_blocked(self):
         return self.pick_material(1, 0) == 'GROUND'
 
@@ -64,7 +63,17 @@ class Sensors(object):
             return self.material[2]
         return 'UNKNOWN'
 
-class GameInfo(object):
+
+class Laser(object):
+    def __init__(self, params_dic):
+        pass
+
+    def fire(self):
+        raise AttributeError("Laser is broken")
+
+
+class Robo(object):
     def __init__(self, params_dic):
         self.gps = Gps(params_dic)
         self.sensors = Sensors(params_dic)
+        self.laser = Laser(params_dic)
