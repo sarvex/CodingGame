@@ -6,24 +6,29 @@
     <link type="text/css" rel="stylesheet" href="hints.css"/>
 </head>
 <body>
-<h1>Welcome to code game</h1>
-
-<h2>The <code>hero_action</code> function</h2>
+<h1>Welcome to RoboBrains game</h1>
 
 <p>
-    Hero action is your hero brain. You need to return ether <code>game.Jump()</code> or <code>game.Forward()</code>.
-    You may investigate your <code>game_info</code> param.
+    You are controlling a robo that has fallen down on a mysterious planet.
+    You can help him move by implementing a program in his brain.
 </p>
 
-<h2>The <code>game_info</code> param fields</h2>
-It has the following functions:
+<h3>The <code>robo_action</code> function</h3>
+
+<p>
+    That is the main function of the robo brain. You can return either <code>game.Jump()</code> or <code>game.Forward()</code>
+    for example to make robo jump or move forward.
+    You may investigate your <code>robo</code> argument. It provides access to all robo subsystems: gps, sensors, laser.
+</p>
+
+The <code>robo</code> argument has the following functions:
 <dl>
-    <dd><code>hero_x</code></dd>
-    <dt>Hero horizontal position</dt>
-    <dd><code>hero_y</code></dd>
-    <dt>Hero vertincal position</dt>
-    <dd><code>obstacle_front</code></dd>
-    <dt>Some junk in front of you</dt>
+    <dd><code>gps.x</code></dd>
+    <dt>Robo horizontal position</dt>
+    <dd><code>gps.y</code></dd>
+    <dt>Robo vertincal position</dt>
+    <dd><code>sensors.is_barrier_near()</code></dd>
+    <dt>Function that returns True if there is a barrier in front of the robo. You can use it to pass obstacles</dt>
 </dl>
 
 </body>
