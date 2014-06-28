@@ -20,7 +20,7 @@ type Levels = Array.Array Level
 
 type Segment = (Float, (Float, Float))
 
-first = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(30, (450, 499))]}
+first = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(70, (450, 499))]}
 --first = {groundx=[], groundy=[50]}
 
 levels: Levels
