@@ -14,7 +14,7 @@ class Command(object):
         return {"action": clz.command_name, "direction": clz.direction}
 
 
-class Forward(Command):
+class Run(Command):
     command_name = "forward"
     direction = "forward"
 
