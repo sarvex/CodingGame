@@ -16,9 +16,8 @@ $(document).ready(function () {
                 var module = Sk.importMainWithBody("<stdin>", false, editor.getValue());
                 $(document).trigger("codeLaunched", module);
             } catch (e) {
-                var error = e.toString() + "\n";
-                alert("importMainWithBody: " + error);
-                outf(error);
+                var error = e.toString();
+                $('#pyerror').val(error);
             }
         },
         "Shift-Enter": function (editor) {
