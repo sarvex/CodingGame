@@ -45,13 +45,21 @@ class Gps(object):
 
 class Sensors(object):
     def __init__(self, params_dic):
-        self.obstacle_front = params_dic['obstacle_front']
+        # (1, 1), (1, 0), (1, -1)
+        self.material = params_dic['material']
+
 
     def is_barrier_near(self):
-        return self.obstacle_front
+        return self.pick_material(1, 0) == 'GROUND'
 
     def pick_material(self, x, y):
-        return _elm._pick_material(x, y)
+        if x == 1 and y == 1:
+            return self.material[0]
+        if x == 1 and y == 0:
+            return self.material[1]
+        if x == 1 and y == -1:
+            return self.material[2]
+        return 'UNKNOWN'
 
 class GameInfo(object):
     def __init__(self, params_dic):

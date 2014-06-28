@@ -20,7 +20,7 @@ type Levels = Array.Array Level
 
 type Segment = (Float, (Float, Float))
 
-first_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 150, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(30, (450, 499))]}
+first_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 150, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(90, (450, 499))]}
 end_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 300, groundx = [], groundy = [], water = []}
 
 levels: Levels
@@ -184,7 +184,7 @@ physics t (dir_x, dir_y) g hero =
                      else if dir_y>0 then 5
                      else 0           -- stand 
                          
-              ,vx <- toFloat dir_x    -- walking speed
+              ,vx <- (toFloat dir_x)*1.5    -- walking speed
               ,dir <- if | dir_x < 0     -> Left
                          | dir_x > 0     -> Right
                          | otherwise   -> hero.dir
@@ -273,21 +273,27 @@ port summarize: Int -> Int -> Int
 port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
 -- This function is exported to python
-port pick_material: Int -> Int -> String
-port pick_material = (\x y -> (if x > y then "WATER" else "STONE"))
+--port pick_material: Signal (Int -> Int -> String)
+--port pick_material = lift (\g x y -> (if not  (isNothing (intersectBlocksHor (toFloat x) (toFloat y) big_eps big_eps (cur_level g).water))  then "WATER" else "STONE")) gameState
 
 
-obstacle_front g = 
+blockAt g (x, y) blocks = 
    let 
        hero = g.hero
-       b = groundBlocks g.w (cur_level g)
-       x = hero.x
-       y = hero.y
-       seg  = intersectBlocksHor x  (y + hero.h) hero.w hero.h  b
+       seg  = intersectBlocksHor (hero.x + hero.w*x)  (hero.y + hero.h*y) big_eps big_eps blocks
    in not (isNothing seg)
 
+groundAt g (x, y) = blockAt g (x, y) (groundBlocks g.w (cur_level g))
+
+waterAt g (x, y)= blockAt g (x, y) (cur_level g).water
+   
+
+material g = 
+  map (\(x, y) -> if groundAt g (x, y) then "GROUND" else if waterAt g (x, y) then "WATER" else "NOTHING") 
+      [(1, 1), (1, 0), (1, -1)]
+
 -- Send Record
-port messageOut : Signal ({ hero_x:Int, hero_y:Int, obstacle_front:Bool, obstacle_back:Bool, obstacle_top:Bool })
-port messageOut =  lift (\g -> {hero_x = round g.hero.x,  hero_y = round g.hero.y, obstacle_front = obstacle_front g, obstacle_back = False, obstacle_top = False}) gameState
+port messageOut : Signal ({ hero_x:Int, hero_y:Int, material: [String] })
+port messageOut =  lift (\g -> {hero_x = round g.hero.x,  hero_y = round g.hero.y, material = material g}) gameState
 
 
