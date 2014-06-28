@@ -28,7 +28,7 @@ class Jump(Command):
 
 
 # class Left(Command):
-#     command_name = "turn"
+# command_name = "turn"
 #     direction = LEFT
 #
 #
@@ -38,17 +38,20 @@ class Jump(Command):
 
 
 class Gps(object):
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, params_dic):
+        self.x = params_dic['hero_x']
+        self.y = params_dic['hero_y']
+
+
+class Sensors(object):
+    def __init__(self, params_dic):
+        self.obstacle_front = params_dic['obstacle_front']
+
+    def is_barrier_near(self):
+        return self.obstacle_front
 
 
 class GameInfo(object):
     def __init__(self, params_dic):
-        self.gps = Gps(params_dic['hero_x'], params_dic['hero_y'])
-        self.obstacle_front = params_dic['obstacle_front']
-        self.obstacle_back = params_dic['obstacle_back']
-        self.obstacle_top = params_dic['obstacle_top']
-
-    def get_coords_sum(self):
-        return _game.summarize(self.hero_x, self.hero_y)
+        self.gps = Gps(params_dic)
+        self.sensors = Sensors(params_dic)
