@@ -142,7 +142,7 @@
 
         $(document).bind("codeLaunched", function (event, module) {
             try {
-                fun = module.tp$getattr('robot_action');
+                fun = module.tp$getattr('robo_action');
 
                 if (!fun) {
                     $(document).trigger("pyError", "function robot_action not found");
