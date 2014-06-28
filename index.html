@@ -106,7 +106,7 @@
 
         var div = document.getElementById('game');
         // TODO: Move default value to python
-        var game = Elm.embed(Elm.Game, div, { code_port: {action: "stop", direction: "None"} });
+        var game = Elm.embed(Elm.Game, div, { code_port: {action: "start", direction: "None"} });
 
         $(document).bind("pyError", function (event, error) {
             if (game.ports.code_port) {

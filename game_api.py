@@ -18,6 +18,9 @@ class Forward(Command):
     command_name = "forward"
     direction = "forward"
 
+class Stop(Command):
+    command_name = "stop"
+    direction = "stop"
 
 class Jump(Command):
     def __init__(self, direction=TOP):
