@@ -272,6 +272,10 @@ port code_port : Signal ({action:String, direction:String})
 port summarize: Int -> Int -> Int
 port summarize = (\x y -> x + y * 3) -- 3 here is to show it works in elm :)
 
+-- This function is exported to python
+port pick_material: Int -> Int -> String
+port pick_material = (\x y -> (if x > y then "WATER" else "STONE"))
+
 
 obstacle_front g = 
    let 
