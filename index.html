@@ -154,7 +154,9 @@
                     alert("failed to load game.GameInfo");
                 }
                 run_button = document.getElementById("skulpt_run")
-                run_button.innerHTML = "Restart"
+                run_button.innerHTML = "Restart";
+                $("#edoutput").val("");
+                $("#pyerror").val("");
                 game.ports.code_port.send({action: "start", direction: "forward"});
             } catch (ex) {
                 alert("Error codeLaunched:" + ex);
