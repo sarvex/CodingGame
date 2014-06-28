@@ -15,13 +15,13 @@ big_eps = 7
 eps = 0.0001
 
 
-type Level = {image: {x: Int, y: Int, src: String}, groundx: [Float], groundy: [Float], water: [Segment]}
+type Level = {image: {x: Int, y: Int, src: String}, playerx : Float, playery: Float, groundx: [Float], groundy: [Float], water: [Segment]}
 type Levels = Array.Array Level
 
 type Segment = (Float, (Float, Float))
 
-first = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(70, (450, 499))]}
---first = {groundx=[], groundy=[50]}
+first_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 150, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(30, (450, 499))]}
+end_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 300, groundx = [], groundy = [], water = []}
 
 levels: Levels
 levels = Array.fromList [ 
@@ -34,13 +34,14 @@ levels = Array.fromList [
       the last segment is horizontal ending at x = w
    2) list of floating polygons represented by list of n points (x, y), where n>=3
 -}
-   first 
+   first_level, 
+   end_level 
    ]
 
 
 get_level: Int->Array.Array Level->Level 
 get_level level_num levels = 
-  Array.getOrElse first level_num levels --todo handle maybe
+  Array.getOrElse end_level level_num levels --todo handle maybe
   
 
 groundBlocks: Float->Level->[Segment]
@@ -104,7 +105,7 @@ actionToArrows action =
 
 defaultHero: Level->Hero
 defaultHero level = 
-  {x = 100, y = 50 + (head level.groundy), vx=0, vy=0, dir=Right, w = 30, h=46, falling=False}
+  {x = level.playerx, y = level.playery, vx=0, vy=0, dir=Right, w = 30, h=46, falling=False}
 
 
 dead: Float->Float->Float->Float->Level->Bool
@@ -114,12 +115,14 @@ dead x y w h level =
 
 win: Float->Float->Float->Float->Level->Bool
 win x y w h level = 
-   if x>w then True else False
+   if x>(w-20) then True else False
 
 
 cur_level: Game->Level
 cur_level g = 
-    get_level g.level_num g.levels
+    get_level (Debug.log "Level" g.level_num) g.levels
+
+isEndLevel g = g.state == Playing && g.level_num == (Array.length g.levels) - 1
 
 
 stepGame : Input -> Game -> Game
@@ -130,15 +133,19 @@ stepGame input ({state, level_num, hero, levels} as game) =
       action = input.action
       delta = input.delta
       
-  in  {game| state   <- if | state == Before && action /= None -> Playing
-                           | state == Playing && level_num > (Array.length levels) -> Finished
+  in  {game| state   <- if | (Debug.log "State" state) == Before && action /= None -> Playing
+                           | isEndLevel game -> Finished
                            | otherwise        -> state
            , hero    <- if | state == Before -> defaultHero level
-                           | state == Playing && action == Start -> defaultHero level 
+                           | state == Playing && action == Start -> defaultHero level
+                           | isEndLevel game -> defaultHero level
                            | state == Playing -> 
-                           if dead hero.x hero.y w h level then defaultHero level 
-                           else step delta (actionToArrows action) game hero 
-                           |otherwise -> hero
+                                  if dead hero.x hero.y w h level then defaultHero level 
+                                  else step delta (actionToArrows action) game hero 
+                           | state == Finished -> 
+                                  if dead hero.x hero.y w h level then defaultHero level 
+                                  else step delta (0, 0) game hero
+                           | otherwise -> hero
            , level_num   <- if state == Playing && (win hero.x hero.y w h level) then level_num + 1 else level_num
            , w <- w
            , h <- h
@@ -224,6 +231,7 @@ render (w',h') game =
       ++ [ (if game.state == Before then displayText w h "Press Start"
                                     else (toForm (image (round hero.w) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
       ++ drawWater w h level.water
+      ++ if game.state == Finished then [displayText w h "You Win"] else []
       )
 
 encodeArrows {x, y} = if | x >0 -> Forward
