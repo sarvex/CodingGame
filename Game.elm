@@ -202,12 +202,23 @@ drawSegments w h c s= map (\(y, (x1, x2)) -> rect (x2-x1) y
                             )
                           s
 
+drawImage: String ->Int->Int->Shape -> Form
+drawImage src w' h' shp = toForm(image w' h' src)
+
+--TODO: Copy/paste
+drawSegmentsTexture: Float -> Float -> String -> (Int, Int)-> [Segment] -> [Form]
+drawSegmentsTexture w h str (w', h') s= map (\(y, (x1, x2)) -> rect (x2-x1) y
+                            |> drawImage str w' h'
+                            |> move (x1 + (x2-x1)/2 - w/2, y/2 - h/2)
+                            )
+                          s
+
 --drawGround: Float->Float->Level -> [Form]
 --drawGround w h l = drawSegments w h (rgb 74 163 41) (groundBlocks w l)
 
 
-drawWater: Float->Float->[Segment] -> [Form]
-drawWater w h s = map (alpha 0.4) (drawSegments w h (rgb 0 0 245) s) 
+drawWater: Float->Float->[Segment]->Bool -> [Form]
+drawWater w h s rnd = map (alpha 0.4) (drawSegmentsTexture w h (if rnd then "imgs/water.png" else "imgs/water2.png" ) (54,33) s)
 
 
 displayText: Float->Float->String -> Form
@@ -230,7 +241,7 @@ render (w',h') game =
                   --|> move (0, 24 - h/2)
       ++ [ (if game.state == Before then displayText w h "Press Start"
                                     else (toForm (image (round hero.w) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
-      ++ drawWater w h level.water
+      ++ drawWater w h level.water ((rem (round game.hero.y) 2) == 0)
       ++ if game.state == Finished then [displayText w h "You Win"] else []
       )
 
