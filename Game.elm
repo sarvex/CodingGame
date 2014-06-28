@@ -218,7 +218,7 @@ drawSegmentsTexture w h str (w', h') s= map (\(y, (x1, x2)) -> rect (x2-x1) y
 
 
 drawWater: Float->Float->[Segment]->Bool -> [Form]
-drawWater w h s rnd = map (alpha 0.4) (drawSegmentsTexture w h (if rnd then "imgs/water.png" else "imgs/water2.png" ) (54,33) s)
+drawWater w h s rnd = map (alpha 0.4) (drawSegmentsTexture w h (if rnd then "imgs/water.png" else "imgs/water2.png" ) (54,90) s)
 
 
 displayText: Float->Float->String -> Form
