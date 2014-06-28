@@ -61,7 +61,7 @@
                                 <code>StdErr &gt;</code>
                                 <input readonly="readonly" type="text" id="pyerror"/>
                             </label>
-                            <button type="button" id="skulpt_run">Start</button>
+                            <button type="button" id="skulpt_run"><span id="but_title">Start</span> <code>(CTRL+Enter)</code></button>
                         </form>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
                     alert("failed to load game.GameInfo");
                 }
                 run_button = document.getElementById("skulpt_run")
-                run_button.innerHTML = "Restart";
+                $("#but_title").text("Restart");
                 $("#edoutput").val("");
                 $("#pyerror").val("");
                 game.ports.code_port.send({action: "start", direction: "forward"});
