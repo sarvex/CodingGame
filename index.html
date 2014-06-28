@@ -25,7 +25,7 @@
 </head>
 
 <body>
-
+<audio id="music" src="sound.mp3" preload="auto"></audio>
 <script type="text/javascript">
     // output functions are configurable.  This one just appends some text
     // to a pre element.
@@ -61,7 +61,8 @@
                                 <code>StdErr &gt;</code>
                                 <input readonly="readonly" type="text" id="pyerror"/>
                             </label>
-                            <button type="button" id="skulpt_run"><span id="but_title">Start</span> <code>(CTRL+Enter)</code></button>
+                            <button type="button" id="skulpt_run"><span id="but_title">Start</span>
+                                <code>(CTRL+Enter)</code></button>
                         </form>
                     </div>
                 </div>
@@ -157,6 +158,11 @@
                 $("#but_title").text("Restart");
                 $("#edoutput").val("");
                 $("#pyerror").val("");
+                var mus = document.getElementById("music");
+                if (mus && mus.play) {
+                    mus.currentTime = 1;
+                    mus.play();
+                }
                 game.ports.code_port.send({action: "start", direction: "forward"});
             } catch (ex) {
                 alert("Error codeLaunched:" + ex);
