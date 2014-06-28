@@ -179,12 +179,12 @@ physics t (dir_x, dir_y) g hero =
       b = groundBlocks g.w (cur_level g)
       vert_int = intersectBlocksVer hero.x (hero.y + t*hero.vy) w h b -- barrier for vertical move
       hor_int  = intersectBlocksHor (hero.x + t*hero.vx) hero.y w h b -- barrier for horizontal move
-  in { hero |  x <- move_hor hero.x (t*hero.vx) w h hor_int
+  in { hero |  x <- if isNothing vert_int then hero.x else 
+                   (move_hor hero.x (t*hero.vx) w h hor_int)
               ,y <- move_vert hero.y (t*hero.vy) w h vert_int
               ,vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
                      else if dir_y>0 then 5
-                     else 0           -- stand 
-                         
+                     else 0           -- stand      
               ,vx <- (toFloat dir_x)*1.5    -- walking speed
               ,dir <- if | dir_x < 0     -> Left
                          | dir_x > 0     -> Right

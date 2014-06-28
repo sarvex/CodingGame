@@ -1,5 +1,5 @@
 from game_api import *
 
 
-def robot_action(robot):
+def robo_action(robo):
     return Stop()
