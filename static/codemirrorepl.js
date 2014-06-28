@@ -4726,7 +4726,7 @@ function CodeMirrorREPL(textareaId, options) {
     indentAuto: function(cm) {cm.indentSelection("smart");},
     indentMore: function(cm) {cm.indentSelection("add");},
     indentLess: function(cm) {cm.indentSelection("subtract");},
-    insertTab: function(cm) {cm.replaceSelection("\t");},
+    insertTab: function(cm) {cm.indentSelection("add");},
     defaultTab: function(cm) {
       if (cm.somethingSelected()) cm.indentSelection("add");
       else cm.execCommand("insertTab");
