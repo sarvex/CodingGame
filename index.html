@@ -76,7 +76,7 @@
 <script type="text/javascript">
     window.ELM_API = {};
     jQuery.ajaxSetup({async: false});
-    var filesToInclude = ["game_api.py", "_game.js"];
+    var filesToInclude = ["game_api.py", "_elm.js"];
     for (var i in  filesToInclude) {
         Sk.builtinFiles["files"]['src/lib/' + filesToInclude[i]] = jQuery.get(filesToInclude[i]).responseText;
     }
@@ -101,7 +101,7 @@
         var game = Elm.embed(Elm.Game, div, { code_port: {action: "None", direction: "None"} });
 
         //TODO: Ugly, global var way to export ELM api functions, rewrite
-        window.ELM_API.summarize = game.ports.summarize;
+        window.ELM_API._pick_material = game.ports.pick_material;
 
         var fun;
         var infoConstructor;

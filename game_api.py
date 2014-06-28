@@ -1,4 +1,4 @@
-import _game
+import _elm
 
 LEFT = "left"
 TOP = "top"
@@ -29,7 +29,7 @@ class Jump(Command):
 
 # class Left(Command):
 # command_name = "turn"
-#     direction = LEFT
+# direction = LEFT
 #
 #
 # class Right(Command):
@@ -50,6 +50,8 @@ class Sensors(object):
     def is_barrier_near(self):
         return self.obstacle_front
 
+    def pick_material(self, x, y):
+        return _elm._pick_material(x, y)
 
 class GameInfo(object):
     def __init__(self, params_dic):
