@@ -72,7 +72,7 @@ body {
 
 /*Console*/
 
-label.console, input#edoutput, input#pyerror {
+label.console code, input#edoutput, input#pyerror {
     background-color: #00232c;
     color: cadetblue;
     font-family: "Consolas", "Lucida Console", "Monaco", monospace;
@@ -105,5 +105,5 @@ input#edoutput, input#pyerror {
 }
 
 label.stderr code, label.stderr input {
-    color: #aa1111 !important;
+    color: darkmagenta;
 }
