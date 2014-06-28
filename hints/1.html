@@ -16,7 +16,7 @@
 <h3>The <code>robo_action</code> function</h3>
 
 <p>
-    That is the main function of the robo brain. You can return either <code>game.Jump()</code> or <code>game.Forward()</code>
+    That is the main function of the robo brain. You can return either <code>Jump()</code> or <code>Forward()</code>
     for example to make robo jump or move forward.
     You may investigate your <code>robo</code> argument. It provides access to all robo subsystems: gps, sensors, laser.
 </p>
@@ -28,6 +28,8 @@ The <code>robo</code> argument has the following functions:
     <dd><code>gps.y</code></dd>
     <dt>Robo vertincal position</dt>
     <dd><code>sensors.is_barrier_near()</code></dd>
+    <dt>Function that returns True if there is a barrier in front of the robo. You can use it to pass obstacles</dt>
+    <dd><code>sensors.get()</code></dd>
     <dt>Function that returns True if there is a barrier in front of the robo. You can use it to pass obstacles</dt>
 </dl>
 
