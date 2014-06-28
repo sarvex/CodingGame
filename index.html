@@ -26,6 +26,8 @@
 
 <body>
 <audio id="music" src="sound.mp3" preload="auto"></audio>
+<audio id="music2" src="sound2.mp3" preload="auto"></audio>
+<audio id="music3" src="sound3.mp3" preload="auto"></audio>
 <script type="text/javascript">
     // output functions are configurable.  This one just appends some text
     // to a pre element.
@@ -157,10 +159,16 @@
                 $("#but_title").text("Restart");
                 $("#edoutput").val("");
                 $("#pyerror").val("");
-                var mus = document.getElementById("music");
-                if (mus && mus.play) {
-                    mus.currentTime = 1;
-                    mus.play();
+                var musics = [document.getElementById("music"), document.getElementById("music2"), document.getElementById("music3")]
+
+                var musToPlay = musics[ Math.floor((Math.random() * 3))];
+
+                if (musics[0] && musics[0].play) {
+                    for(var i = 0; i < musics.length; i++) {
+                        musics[i].currentTime = 1;
+                        musics[i].pause();
+                    }
+                    musToPlay.play();
                 }
                 game.ports.code_port.send({action: "start", direction: "forward"});
             } catch (ex) {
