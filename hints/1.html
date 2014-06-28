@@ -27,8 +27,9 @@ The <code>robo</code> argument has the following functions and fields:
     <dt>Robo horizontal position</dt>
     <dd><code>gps.y</code></dd>
     <dt>Robo vertincal position</dt>
-    <dd><code>sensors.is_barrier_near()</code></dd>
-    <dt>Function that returns True if there is a barrier in front of the robo. You can use it to pass obstacles</dt>
+    <dd><code>sensors.is_blocked()</code></dd>
+    <dt>Function that returns True if there is the sensor is blocked by a barrier in front of the robo. You can use it to detect if there is an
+        obstacles on your way.</dt>
     <dd><code>sensors.pick_material(x, y)</code></dd>
     <dt>This sensor function returns material that is located near the robo.
         <br/>It has 2 arguments <code>x, y</code> that specify the direction to pick material from.
