@@ -17,7 +17,7 @@ $(document).ready(function () {
                 $(document).trigger("codeLaunched", module);
             } catch (e) {
                 var error = e.toString();
-                $('#pyerror').val(error);
+                $(document).trigger("pyError", error);
             }
         },
         "Shift-Enter": function (editor) {
