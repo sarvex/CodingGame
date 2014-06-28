@@ -120,7 +120,7 @@ win x y w h level =
 
 cur_level: Game->Level
 cur_level g = 
-    get_level (Debug.log "Level" g.level_num) g.levels
+    get_level g.level_num g.levels
 
 isEndLevel g = g.state == Playing && g.level_num == (Array.length g.levels) - 1
 
@@ -133,7 +133,7 @@ stepGame input ({state, level_num, hero, levels} as game) =
       action = input.action
       delta = input.delta
       
-  in  {game| state   <- if | (Debug.log "State" state) == Before && action /= None -> Playing
+  in  {game| state   <- if | state == Before && action /= None -> Playing
                            | isEndLevel game -> Finished
                            | otherwise        -> state
            , hero    <- if | state == Before -> defaultHero level
