@@ -105,5 +105,5 @@ input#edoutput, input#pyerror {
 }
 
 label.stderr code, label.stderr input {
-    color: darkmagenta;
+    color: darkmagenta !important;
 }
