@@ -97,8 +97,15 @@
         document.title = 'Coding game, level ' + nLevel;
     }
 
-
+    var musToPlay;
+    var musLaunched = false;
     $(document).ready(function () {
+        var musics = [document.getElementById("music"), document.getElementById("music2"), document.getElementById("music3")]
+        if (!musToPlay) {
+            musToPlay = musics[ Math.floor((Math.random() * 3))];
+        }
+
+
         $(document).bind("pyError", function (event, error) {
             $("#pyerror").val(error);
         });
@@ -143,6 +150,7 @@
 
         });
 
+
         $(document).bind("codeLaunched", function (event, module) {
             try {
                 fun = module.tp$getattr('robo_action');
@@ -160,16 +168,10 @@
                 $("#but_title").text("Restart");
                 $("#edoutput").val("");
                 $("#pyerror").val("");
-                var musics = [document.getElementById("music"), document.getElementById("music2"), document.getElementById("music3")]
 
-                var musToPlay = musics[ Math.floor((Math.random() * 3))];
-
-                if (musics[0] && musics[0].play) {
-                    for(var i = 0; i < musics.length; i++) {
-                        musics[i].currentTime = 1;
-                        musics[i].pause();
-                    }
+                if (musToPlay && musToPlay.play && (!musLaunched)) {
                     musToPlay.play();
+                    musLaunched = true;
                 }
                 game.ports.code_port.send({action: "start", direction: "forward"});
             } catch (ex) {
