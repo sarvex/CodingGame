@@ -21,7 +21,7 @@ type Levels = Array.Array Level
 type Segment = (Float, (Float, Float))
 
 first_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 150, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(90, (450, 499))]}
-end_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 300, groundx = [], groundy = [], water = []}
+end_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 300, groundx = [], groundy = [], water = [(90, (450, 499))]}
 
 levels: Levels
 levels = Array.fromList [ 
@@ -87,11 +87,11 @@ type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float,
 defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 30, h = 46, falling = False}
 
 
-type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float}
+type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float, time: Float}
 
 
 defaultGame: Game
-defaultGame = {state = Before, level_num=0, hero=defHero, levels = levels, w = 0, h = 0}
+defaultGame = {state = Before, level_num=0, hero=defHero, levels = levels, w = 0, h = 0, time = 0}
 
 
 actionToArrows: Action->(Int, Int)
@@ -149,6 +149,7 @@ stepGame input ({state, level_num, hero, levels} as game) =
            , level_num   <- if state == Playing && (win hero.x hero.y w h level) then level_num + 1 else level_num
            , w <- w
            , h <- h
+           , time <- game.time + input.delta
       }
 
 gameState = foldp stepGame defaultGame input
@@ -241,7 +242,7 @@ render (w',h') game =
                   --|> move (0, 24 - h/2)
       ++ [ (if game.state == Before then displayText w h "Press Start"
                                     else (toForm (image (round hero.w) (round hero.h) src) |> move (hero.x - w/2, hero.y - h/2 - 2)))]
-      ++ drawWater w h level.water ((rem (round game.hero.y) 2) == 0)
+      ++ drawWater w h level.water ((rem (round game.time) 2) == 0)
       ++ if game.state == Finished then [displayText w h "You Win"] else []
       )
 
