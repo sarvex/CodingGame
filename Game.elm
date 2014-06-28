@@ -21,7 +21,7 @@ type Levels = Array.Array Level
 type Segment = (Float, (Float, Float))
 
 first_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 310, groundx = [200, 270, 450, 500], groundy = [100, 150, 100, 0, 100], water = [(90, (450, 499))]}
-end_level = {image = {x = 751, y = 302, src="imgs/levels/1.jpg"}, playerx = 100, playery = 300, groundx = [], groundy = [], water = [(90, (450, 499))]}
+end_level = {image = {x = 751, y = 302, src="imgs/end.jpg"}, playerx = 100, playery = 300, groundx = [], groundy = [], water = []}
 
 levels: Levels
 levels = Array.fromList [ 
@@ -179,8 +179,7 @@ physics t (dir_x, dir_y) g hero =
       b = groundBlocks g.w (cur_level g)
       vert_int = intersectBlocksVer hero.x (hero.y + t*hero.vy) w h b -- barrier for vertical move
       hor_int  = intersectBlocksHor (hero.x + t*hero.vx) hero.y w h b -- barrier for horizontal move
-  in { hero |  x <- if isNothing vert_int then hero.x else 
-                   (move_hor hero.x (t*hero.vx) w h hor_int)
+  in { hero |  x <- (move_hor hero.x (t*hero.vx) w h hor_int)
               ,y <- move_vert hero.y (t*hero.vy) w h vert_int
               ,vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
                      else if dir_y>0 then 5
