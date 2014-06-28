@@ -82,9 +82,9 @@ data Action = Start | Forward | Backward | Jump | None
 data Direction = Right | Left
 
 
-type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float, h: Float, falling: Bool}
+type Hero = {x: Float, y: Float, vx: Float, vy: Float, dir: Direction, w: Float, h: Float, falling: Bool, action: Action}
 
-defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 30, h = 46, falling = False}
+defHero = { x=0, y=0, vx=0, vy=0, dir=Right, w = 30, h = 46, falling = False, action = None}
 
 
 type Game = {state: State, level_num: Int, hero: Hero, levels: Levels, w: Float, h:Float, time: Float}
@@ -105,7 +105,7 @@ actionToArrows action =
 
 defaultHero: Level->Hero
 defaultHero level = 
-  {x = level.playerx, y = level.playery, vx=0, vy=0, dir=Right, w = 30, h=46, falling=False}
+  {x = level.playerx, y = level.playery, vx=0, vy=0, dir=Right, w = 30, h=46, falling=False, action = None}
 
 
 dead: Float->Float->Float->Float->Level->Bool
@@ -141,10 +141,10 @@ stepGame input ({state, level_num, hero, levels} as game) =
                            | isEndLevel game -> defaultHero level
                            | state == Playing -> 
                                   if dead hero.x hero.y w h level then defaultHero level 
-                                  else step delta (actionToArrows action) game hero 
+                                  else step delta action game hero 
                            | state == Finished -> 
                                   if dead hero.x hero.y w h level then defaultHero level 
-                                  else step delta (0, 0) game hero
+                                  else step delta None game hero
                            | otherwise -> hero
            , level_num   <- if state == Playing && (win hero.x hero.y w h level) then level_num + 1 else level_num
            , w <- w
@@ -171,15 +171,17 @@ move_vert y dy w h seg = case seg of
                                              
 
 
-physics: Float->(Int, Int)->Game->Hero->Hero
-physics t (dir_x, dir_y) g hero =  
+physics: Float->Action->Game->Hero->Hero
+physics t a g hero =  
   let 
+      (dir_x, dir_y) = actionToArrows a
       w = hero.w/2
       h = hero.h/2
       b = groundBlocks g.w (cur_level g)
       vert_int = intersectBlocksVer hero.x (hero.y + t*hero.vy) w h b -- barrier for vertical move
       hor_int  = intersectBlocksHor (hero.x + t*hero.vx) hero.y w h b -- barrier for horizontal move
-  in { hero |  x <- (move_hor hero.x (t*hero.vx) w h hor_int)
+  in { hero |  x <- if isNothing vert_int && not (hero.action == Jump) then hero.x else 
+                   (move_hor hero.x (t*hero.vx) w h hor_int)
               ,y <- move_vert hero.y (t*hero.vy) w h vert_int
               ,vy <- if isNothing vert_int then hero.vy - t/4 -- gravity
                      else if dir_y>0 then 5
@@ -189,10 +191,11 @@ physics t (dir_x, dir_y) g hero =
                          | dir_x > 0     -> Right
                          | otherwise   -> hero.dir
               ,falling <- isNothing vert_int && (hero.vy < -1.5)
+              ,action  <- if not (isNothing vert_int) then a else hero.action 
      } 
 
-step: Float -> (Int, Int) -> Game -> Hero-> Hero
-step t dir g = physics t dir g
+step: Float -> Action -> Game -> Hero-> Hero
+step t a g = physics t a g
 
 
 drawSegments: Float -> Float -> Color -> [Segment] -> [Form]
