@@ -29,8 +29,13 @@ The <code>robo</code> argument has the following functions:
     <dt>Robo vertincal position</dt>
     <dd><code>sensors.is_barrier_near()</code></dd>
     <dt>Function that returns True if there is a barrier in front of the robo. You can use it to pass obstacles</dt>
-    <dd><code>sensors.get()</code></dd>
-    <dt>Function that returns True if there is a barrier in front of the robo. You can use it to pass obstacles</dt>
+    <dd><code>sensors.pick_material(x, y)</code></dd>
+    <dt>This sensor function returns material that is located near the robo.
+        <br/>It has 2 arguments <code>x, y</code> that specify the direction to pick material from.
+        <br/><code>1, 1</code> is for picking from <em>upper</em> forward direction
+        <br/><code>1, 0</code> is for picking from <em>straight</em> forward direction
+        <br/><code>1, -1</code> is for picking from <em>lower</em> forward direction
+    </dt>
 </dl>
 
 </body>
