@@ -55,12 +55,13 @@ class Sensors(object):
         return self.pick_material(1, 0) == 'GROUND'
 
     def pick_material(self, x, y):
-        if x == 1 and y == 1:
-            return self.material[0]
-        if x == 1 and y == 0:
-            return self.material[1]
-        if x == 1 and y == -1:
-            return self.material[2]
+        if x == 1:
+            if y == 1:
+                return self.material[0]
+            if y == 0:
+                return self.material[1]
+            if y == -1:
+                return self.material[2]
         return 'UNKNOWN'
 
 
